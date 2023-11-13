@@ -20,11 +20,13 @@ import java.util.List;
 public class Mazo {
     // Lista de cartas que guarda el mazo
     private ArrayList<Carta> cartas;
+    private boolean vacio = true;
 
     // Constructor del mazo
-    public Mazo(boolean vacio){
+    public Mazo(boolean vacio) {
         cartas = new ArrayList<>();
-        if(!vacio) {
+        if (!vacio) {
+            this.vacio = false;
             // Los 20 organos
             insertarCartasDeOrganos();
 
@@ -39,7 +41,7 @@ public class Mazo {
         }
     }
 
-    public void mezclarMazo(){
+    public void mezclarMazo() {
         // Mezclo el mazo utilizando la clase Collections, que tiene un metodo shuffle que permite randomizar las posiciones
         Collections.shuffle(cartas);
     }
@@ -48,22 +50,22 @@ public class Mazo {
         return cartas;
     }
 
-    public Carta[] dar3Cartas(){
-        Carta[] cartasJugador = new Carta[3];
+    public Carta[] darNCartas(int cantidad) {
+        Carta[] cartasParaDar = new Carta[cantidad];
 
-        // Verifico que haya 3 cartas en el mazo
-        if(cartas.size() >= 3){
-            for (int i = 0; i < 3; i++) {
-                // Tomo las ultimas cartas del mazo, es decir, las que están en la parte superior.
-                cartasJugador[i] = cartas.get(cartas.size() - i - 1);
+        // Si la cantidad de cartas en el mazo es mayor a la cantidad pedida
+        if (cantidadDeCartasEnMazo() > cantidad) {
+            for (int i = 0; i < cantidad; i++) {
+                // voy sacando las cartas desde la última
+                // Que en la vida real sería la carta superior del mazo, cuando el
+                // Mazo está boca abajo.
+                cartasParaDar[i] = this.cartas.get(cartas.size() - 1);
+                this.cartas.remove(cartas.size() - 1);
+
+                // Controlar el caso
             }
         }
-
-        // Elimino esas cartas tomadas del mazo
-        for (int i = 0; i < 3; i++) {
-            cartas.remove(cartas.size() - 1);
-        }
-        return cartasJugador;
+        return cartasParaDar;
     }
 
     /* Metodo para dar 1 carta */
@@ -71,7 +73,7 @@ public class Mazo {
         Carta cartaParaDar = null;
 
         // Agregar la comprobacion para llenar el mazo en caso de que se vacíe.
-        if(cartas.size() >= 1){
+        if(!cartas.isEmpty()){
             cartaParaDar = cartas.get(cartas.size() - 1);
             cartas.remove(cartas.size() - 1);
         }
@@ -115,11 +117,26 @@ public class Mazo {
         }
     }
 
+    /* Metodo que llena el mazo a partir de otro
+    * Comunmente usado cuando el mazo está vacío, se le envía el de descartes.*/
+    public void llenarMazo(Mazo mazo){
+        this.cartas.addAll(mazo.cartas); // Uso addAll de collection que hace lo mismo
+    }
+
+    /* Vacia el mazo por completo */
+    public void vaciarMazo(){
+        cartas.clear();
+    }
+
     public int cantidadDeCartasEnMazo(){
         return cartas.size();
     }
 
     public void agregarCarta(Carta carta){
         cartas.add(carta);
+    }
+
+    public boolean estaVacio(){
+        return cartas.isEmpty();
     }
 }

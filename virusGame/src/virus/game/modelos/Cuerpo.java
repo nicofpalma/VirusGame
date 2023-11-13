@@ -67,7 +67,7 @@ public class Cuerpo {
     /* Encuentra un organo a través de un color.
     * Los colores de los organos coinciden con los colores de la vacuna o virus de dicho organo
     */
-    private Organo encontrarOrgano(Color color){
+    public Organo encontrarOrgano(Color color){
         Organo organoEncontrado = null;
         for (int i = 0; i < cuerpo.size(); i++) {
             organoEncontrado = cuerpo.get(i);
@@ -77,12 +77,6 @@ public class Cuerpo {
         }
         return organoEncontrado;
     }
-
-    /* Esto sucede cuando tiene dos infecciones */
-    //public void extirparOrgano(Organo organo){
-    //    cuerpo.remove();
-    //    encontrarOrgano(organo.getColor());
-    //}
 
     /* Agrega una carta al cuerpo del jugador, verifica que el organo no exista */
     public boolean agregarOrganoAlCuerpo(Organo organo){

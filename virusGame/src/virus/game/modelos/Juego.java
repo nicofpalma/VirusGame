@@ -54,8 +54,20 @@ public class Juego implements IObservable {
         return true;
     }
 
+    /* Busca un organo compatible para curar
+    * Se fija si el organo no es inmune
+    * En ese caso, lo cura. Devuelve true.
+    * Si ya es inmune, no lo cura. Devuelve falso.
+    * Si no existe, devuelve falso. */
     public boolean jugarCarta(Jugador jugador, Medicina medicina){
-
+        Organo organoACurar = jugador.getCuerpoJugador().encontrarOrgano(medicina.getColor());
+        if(organoACurar != null){
+            if(!organoACurar.esInmune()){
+                jugador.getCuerpoJugador().curarOrgano(medicina);
+                return true;
+            }
+            return false;
+        }
         return false;
     }
 
@@ -67,7 +79,7 @@ public class Juego implements IObservable {
         Organo organoExtirpado = jugador.getCuerpoJugador().extirparOrgano(organo);
         Virus[] infeccionesExtraidas = organoExtirpado.extraerInfecciones();
         Medicina[] medicinasExtraidas = organoExtirpado.extraerMedicinas();
-        for (int i = 0; i < infeccionesExtraidas.length; i++) {
+        for (int i = 0; i < medicinasExtraidas.length; i++) {
             mazoDeDescarte.agregarCarta(medicinasExtraidas[i]);
         }
         for (int i = 0; i < infeccionesExtraidas.length; i++) {
@@ -103,15 +115,32 @@ public class Juego implements IObservable {
         }
     }
 
-    private void agregarCartaAlMazoDeDescartes(Carta carta){
+    private void descartarCarta(Carta carta){
         mazoDeDescarte.agregarCarta(carta);
     }
 
-    private void dar1CartaJugador(Jugador jugador){
-
+    /* Metodo que permite intecambiar el mazo de descartes con el mazo principal */
+    public void intercambiarMazos(){
+        if(!mazo.getCartas().isEmpty()){
+            for (int i = 0; i < mazoDeDescarte.getCartas().size(); i++) {
+                // Envío cada carta del mazo de descarte, al mazo original.
+                // Esto pasa cuando el mazo está vacío unicamente.
+                mazo.getCartas().add(mazoDeDescarte.getCartas().get(i));
+            }
+            mazo.mezclarMazo();
+            mazoDeDescarte.vaciarMazo();
+        }
     }
 
-    private void darCartasFaltantesJugador(Jugador jugador){
+    private void dar1CartaJugador(Jugador jugador){
+        jugador.recibirCarta(mazo.dar1Carta());
+    }
+
+    private void darCartasFaltantesJugador(Jugador jugador, int cantidad){
+        Carta[] cartasRobadas = mazo.darNCartas(cantidad);
+        for (int i = 0; i < cartasRobadas.length; i++) {
+            jugador.recibirCarta(cartasRobadas[i]);
+        }
     }
 
     @Override
