@@ -42,13 +42,11 @@ public class VistaConsola extends JFrame implements IVista {
                         break;
                     }
                     case TURNO_JUGADOR:{
-                        //mostrarMesa();
                         jugadorRealizaUnaAccion();
                         break;
                     }
                     case DESCARTAR_CARTAS:{
                         elegirCartasADescartar();
-                        //mostrarMesa();
                         break;
                     }
                     default: {

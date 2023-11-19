@@ -61,10 +61,7 @@ public class Controlador implements IObservador {
         }
 
         // Notifico si se pudo jugar la carta en cuestión
-        if(sePudoJugarUnaCarta){
-            return true;
-        }
-        return false;
+        return sePudoJugarUnaCarta;
     }
 
     // Se ejecuta cuando el jugador quiere descartar cartas

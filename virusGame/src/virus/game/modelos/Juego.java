@@ -183,6 +183,7 @@ public class Juego implements IObservable {
         for (int i = 0; i < cartasRobadas.length; i++) {
             jugador.recibirCarta(cartasRobadas[i]);
         }
+
     }
 
     @Override

@@ -59,10 +59,29 @@ public class Mazo {
                 // voy sacando las cartas desde la última
                 // Que en la vida real sería la carta superior del mazo, cuando el
                 // Mazo está boca abajo.
+                Carta cartaParaDar = this.cartas.get(cartas.size() - 1);
+                if(cartaParaDar == null){
+
+                }
                 cartasParaDar[i] = this.cartas.get(cartas.size() - 1);
+
                 this.cartas.remove(cartas.size() - 1);
 
-                // Controlar el caso
+                // TODO Controlar el caso de cartas faltantes en mazo
+                /* Una solucion posible sería usar el metodo "darUnaCarta"
+                 * Al usar este metodo, puedo intentar dar una carta, de una en una.
+                 * Si una de esas cartas no se dar, entonces el mazo está vacío.
+                 * En ese momento, puedo intercambiar los mazos desde la clase
+                 * Juego, que es la que conoce ambos mazos.
+                 *
+                 * Otra solucion sería cortar el ciclo, devolver false o null
+                 * - Controlar ese caso desde la clase Juego
+                 * - Intercambiar los mazos y llamar a darNCartas devuelta.
+                 * con la cantidad de cartas que faltan por dar.
+                 * - Es una solución bastante rebuscada y poco optima
+                 * - La de arriba es mejor.
+                 */
+
             }
         }
         return cartasParaDar;
