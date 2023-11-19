@@ -28,11 +28,14 @@ public abstract class Organo extends Carta{
     @Override
     public String toString() {
         String nombreOrgano = "[" + this.getClass().getSimpleName();
-        if(infecciones != null){
-            nombreOrgano += " (INFECTADO)";
+        if(!infecciones.isEmpty()){
+            nombreOrgano += " -INFECTADO";
         }
-        if(medicinas != null){
-            nombreOrgano += " (VACUNADO)";
+        if(!medicinas.isEmpty()){
+            nombreOrgano += " -VACUNADO";
+        }
+        if(esInmune()){
+            nombreOrgano += " -INMUNE";
         }
         nombreOrgano += "]";
         return nombreOrgano;
@@ -44,6 +47,14 @@ public abstract class Organo extends Carta{
         medicinas = new ArrayList<Medicina>();
         inmune = false;
         extirpado = false;
+    }
+
+    public void eliminarMedicinas(){
+        this.medicinas = new ArrayList<Medicina>(2);
+    }
+
+    public void eliminarInfecciones(){
+        this.infecciones = new ArrayList<Virus>(2);
     }
 
     public Medicina[] extraerMedicinas(){
@@ -70,6 +81,12 @@ public abstract class Organo extends Carta{
     // Getter infecciones
     public ArrayList<Virus> getInfecciones() {
         return infecciones;
+    }
+
+    // Elimina la infeccion y la medicina cuando tiene 1 infeccion y 1 medicina
+    public void cancelarInfeccionYMedicina(){
+        this.medicinas = new ArrayList<Medicina>(2);
+        this.infecciones = new ArrayList<Virus>(2);
     }
 
     /* Agrega una infeccion si el organo no es inmune. Si tiene 2 infecciones, extirpado se pone en true */

@@ -26,11 +26,22 @@ public class Juego implements IObservable {
     }
 
     public void iniciarJuego(){
+        // Inicia el juego si ya hay 2 jugadores
         if(jugadores.size() >= 2) this.notificarCambio(AccionModelo.INICIAR_JUEGO);
+        else {
+            // Notifica que espere el registro si no hay 2 jugadores
+            this.notificarCambio(AccionModelo.ESPERAR_REGISTRO);
+        }
     }
 
     public boolean jugarCarta(Jugador jugador, Organo organo){
-        return jugador.getCuerpoJugador().agregarOrganoAlCuerpo(organo);
+        boolean organoAgregado = jugador.getCuerpoJugador().agregarOrganoAlCuerpo(organo);
+        if (organoAgregado){
+            jugador.eliminarCartaDeLaMano(organo);
+        }
+
+        // Retorna true si se pudo jugar
+        return organoAgregado;
     }
 
     /* Intenta aplicar una infeccion
@@ -46,10 +57,20 @@ public class Juego implements IObservable {
             return false;
         }
 
-        // Elimina el organo del cuerpo si está para extirpar (con dos infecciones)
         if(organoAfectado.estaExtirpado()){
-            extirparOrganoDelCuerpo(jugador, organoAfectado);
+            // Elimina el organo del cuerpo si está para extirpar (con dos infecciones)
+            extirparOrganoDelCuerpo(getRival(jugador), organoAfectado);
+        } else {
+            // Si tiene 1 infeccion y 1 medicina, elimino ambas y las envio a descartes
+            if(organoAfectado.getInfecciones().size() == 1 && organoAfectado.getMedicinas().size() == 1){
+                mazoDeDescarte.agregarCarta(organoAfectado.getMedicinas().get(0));
+                mazoDeDescarte.agregarCarta(organoAfectado.getInfecciones().get(0));
+                cuerpoRival.eliminarInfeccionYMedicina(organoAfectado);
+            }
         }
+
+        jugador.eliminarCartaDeLaMano(virus);
+
         // Retorna verdadero si el organo fue infectado.
         return true;
     }
@@ -64,6 +85,22 @@ public class Juego implements IObservable {
         if(organoACurar != null){
             if(!organoACurar.esInmune()){
                 jugador.getCuerpoJugador().curarOrgano(medicina);
+
+                // Si se vuelve inmune al aplicar la medicina, la elimino y la agrego al mazo de descartes
+                if(organoACurar.esInmune()){
+                    Medicina[] medicinasExtraidas = organoACurar.extraerMedicinas();
+                    mazoDeDescarte.agregarCarta(medicinasExtraidas[0]);
+                    mazoDeDescarte.agregarCarta(medicinasExtraidas[1]);
+                    jugador.getCuerpoJugador().eliminarMedicinas(organoACurar);
+                } else {
+                    if(organoACurar.getInfecciones().size() == 1 && organoACurar.getMedicinas().size() == 1){
+                        mazoDeDescarte.agregarCarta(organoACurar.getMedicinas().get(0));
+                        mazoDeDescarte.agregarCarta(organoACurar.getInfecciones().get(0));
+                        jugador.getCuerpoJugador().eliminarInfeccionYMedicina(organoACurar);
+                    }
+                }
+
+                jugador.eliminarCartaDeLaMano(medicina);
                 return true;
             }
             return false;
@@ -115,8 +152,13 @@ public class Juego implements IObservable {
         }
     }
 
-    private void descartarCarta(Carta carta){
+    private void agregarCartaAMazoDeDescartes(Carta carta){
         mazoDeDescarte.agregarCarta(carta);
+    }
+
+    public void descartarCartaManoJugador(Jugador jugador, Carta carta){
+        jugador.eliminarCartaDeLaMano(carta);
+        agregarCartaAMazoDeDescartes(carta);
     }
 
     /* Metodo que permite intecambiar el mazo de descartes con el mazo principal */
@@ -136,7 +178,7 @@ public class Juego implements IObservable {
         jugador.recibirCarta(mazo.dar1Carta());
     }
 
-    private void darCartasFaltantesJugador(Jugador jugador, int cantidad){
+    public void darCartasFaltantesJugador(Jugador jugador, int cantidad){
         Carta[] cartasRobadas = mazo.darNCartas(cantidad);
         for (int i = 0; i < cartasRobadas.length; i++) {
             jugador.recibirCarta(cartasRobadas[i]);
@@ -155,8 +197,9 @@ public class Juego implements IObservable {
         this.observadores.add(observador);
     }
 
+
     /* Para terminar el turno de un jugador y dárselo al siguiente */
-    public void cambiarTurnoJugador(){
+    public Jugador cambiarTurnoJugador(){
         // Si el turno de jugador está en nulo, se le da el turno al primer jugador. Esto pasa solo al empezar el juego.
         if(turnoJugador == null){
             turnoJugador = jugadores.get(0);
@@ -166,6 +209,9 @@ public class Juego implements IObservable {
             int indiceSiguiente = (indiceActual + 1) % jugadores.size();
             turnoJugador = jugadores.get(indiceSiguiente);
         }
+
+        notificarCambio(AccionModelo.INICIO_NUEVO_TURNO);
+        return turnoJugador;
     }
 
     public Mazo getMazoDeDescarte() {

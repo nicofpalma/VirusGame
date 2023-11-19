@@ -7,6 +7,8 @@ import virus.game.vistas.IVista;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class VistaConsola extends JFrame implements IVista {
     private JTextField textoUsuario;
@@ -35,20 +37,103 @@ public class VistaConsola extends JFrame implements IVista {
                         break;
                     }
                     case ESPERAR_TURNO:{
-                        mostrarTextoEnNuevaLinea("Espere a que los jugadores estén listos...");
+                        mostrarMesa();
+                        mostrarTextoEnNuevaLinea("No es tu turno, espera...");
+                        break;
+                    }
+                    case TURNO_JUGADOR:{
+                        //mostrarMesa();
+                        jugadorRealizaUnaAccion();
+                        break;
+                    }
+                    case DESCARTAR_CARTAS:{
+                        elegirCartasADescartar();
+                        //mostrarMesa();
                         break;
                     }
                     default: {
                         break;
                     }
-                    //case MOSTRAR_MESA:{   // Muestra la mesa y permite jugar una carta
-                    //    mostrarMesa();
-                    //    break;
-                    //}
                 }
             }
         });
 
+        textoUsuario.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                // No necesito programar este método
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // Este método sirve para recibir el enter del usuario como si fuese un click
+                if(e.getKeyCode() == KeyEvent.VK_ENTER){
+                    botonConfirmar.doClick();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // No necesito programar este método
+            }
+        });
+
+    }
+
+    @Override
+    public void jugadorRealizaUnaAccion(){
+        // Controla que el numero de carta elegida sea 1, 2 o 3. Si es cero, es un descarte.
+        // Si no es ninguno, muestro error.
+        int numAccion = Integer.parseInt(textoUsuario.getText().trim());
+        if(numAccion == 1 || numAccion == 2 || numAccion == 3){
+            if (controlador.accionarCarta(numAccion)){
+                controlador.finDeTurno();
+            } else {
+                mostrarMesa();
+                noPuedeJugarEsaCarta();
+            }
+        } else {
+            if(numAccion == 0){
+                //Descartar cartas
+                mostrarTextoEnNuevaLinea("Elige qué cartas descartar (Ejemplo: 1, 2, 3 (separados con coma)): ");
+                setAccionVista(AccionVista.DESCARTAR_CARTAS);
+            } else {
+                mostrarMesa();
+                accionIncorrecta();
+            }
+        }
+        borrarInputUsuario();
+    }
+
+    @Override
+    public void elegirCartasADescartar(){
+        String indicesSeparadosConComa = textoUsuario.getText().trim();
+
+        // Separo cada indice con coma
+        String[] indicesStr = indicesSeparadosConComa.split(",");
+
+        if(indicesStr.length > 3 || indicesStr.length < 1){
+            accionIncorrecta();
+        } else {
+            // pongo cada indice en un array de ints
+            int[] indicesCartasADescartar = new int[indicesStr.length];
+            for (int i = 0; i < indicesStr.length; i++) {
+                indicesCartasADescartar[i] = Integer.parseInt(indicesStr[i].trim());
+            }
+            controlador.descartarCartasJugador(indicesCartasADescartar);
+            controlador.finDeTurno();
+        }
+        borrarInputUsuario();
+
+    }
+
+    public void noPuedeJugarEsaCarta(){
+        mostrarTextoEnNuevaLinea("No puede jugar esa carta, intente jugar otra o descarte si no tiene opciones.");
+    }
+
+    @Override
+    public void accionIncorrecta(){
+        mostrarTextoEnNuevaLinea("Acción incorrecta. Solo puede accionar 1, 2 o 3 para jugar cartas. 0 para descartar...");
     }
 
     @Override
@@ -63,6 +148,15 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void avisarEsperaALosDemasJugadores(){
         mostrarTextoEnNuevaLinea("Espere a que los demás jugadores estén listos...");
+    }
+
+    @Override
+    public void avisarTurno(){
+        if (controlador.esSuTurno()){
+            mostrarTextoEnNuevaLinea("*** TU TURNO ***");
+        } else {
+            mostrarTextoEnNuevaLinea("*** TURNO DE " + controlador.getTurnoJugador().getNombre() + " ***");
+        }
     }
 
     @Override
@@ -88,10 +182,13 @@ public class VistaConsola extends JFrame implements IVista {
         mostrarCartasManoJugador();
         separadorLinea();
         separadorLinea();
+        avisarTurno();
     }
 
     public void mostrarElegirCarta(){
-        mostrarTextoEnNuevaLinea("Elige una carta (1, 2 o 3)  ||  Escribe 0 (cero) para descartar hasta 3 cartas");
+        if(controlador.esSuTurno()){
+            mostrarTextoEnNuevaLinea("Elige una carta (1, 2 o 3)  ||  Escribe 0 (cero) para descartar hasta 3 cartas");
+        }
     }
 
     @Override
@@ -125,6 +222,7 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void mostrarCartasManoJugador() {
+        mostrarTextoEnNuevaLinea("TU MANO:");
         mostrarTextoEnNuevaLinea(controlador.getJugador().verCartasMano());
     }
 
@@ -151,7 +249,6 @@ public class VistaConsola extends JFrame implements IVista {
         String nombre = textoUsuario.getText().trim();
         controlador.nuevoJugador(nombre);
         borrarInputUsuario();
-        avisarEsperaALosDemasJugadores();
     }
 
     private String getNombreJugadorControlador(){
@@ -190,6 +287,8 @@ public class VistaConsola extends JFrame implements IVista {
         this.controlador = controlador;
     }
 
-
+    public AccionVista getAccionVista(){
+        return this.accionVista;
+    }
 
 }

@@ -25,5 +25,13 @@ public interface IVista {
 
     void avisarEsperaALosDemasJugadores();
 
+    void avisarTurno();
 
+    void jugadorRealizaUnaAccion();
+
+    void accionIncorrecta();
+
+    AccionVista getAccionVista();
+
+    void elegirCartasADescartar();
 }

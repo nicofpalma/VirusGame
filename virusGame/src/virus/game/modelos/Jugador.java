@@ -61,6 +61,10 @@ public class Jugador {
         }
     }
 
+    public void eliminarCartaDeLaMano(Carta carta){
+        this.mano.remove(carta);
+    }
+
     public void setMano(ArrayList<Carta> mano) {
         this.mano = mano;
     }

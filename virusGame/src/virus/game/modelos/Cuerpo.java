@@ -52,12 +52,24 @@ public class Cuerpo {
         return organoExtirpado;
     }
 
+    public void eliminarInfeccionYMedicina(Organo organo){
+        Organo organoAfectado = encontrarOrgano(organo.getColor());
+        organoAfectado.eliminarMedicinas();
+        organoAfectado.eliminarInfecciones();
+    }
+
+    public void eliminarMedicinas(Organo organo){
+        Organo organoAEliminarMedicinas = encontrarOrgano(organo.getColor());
+        organoAEliminarMedicinas.eliminarMedicinas();
+    }
+
+
     public Organo curarOrgano(Medicina medicina){
         Organo organoCurado;
         organoCurado = encontrarOrgano(medicina.getColor());
         if(organoCurado != null){
             // Devuelve el organo curado (al que se le aplico la medicina)
-            // Tambien lo devuelve si no lo pudo curar porque ya es inmune.
+            // Tambien lo devuelve si no lo pudo curar porque ya es inmune (esto no pasaría nunca).
             organoCurado.agregarMedicina(medicina);
             return organoCurado;
         }
@@ -68,14 +80,12 @@ public class Cuerpo {
     * Los colores de los organos coinciden con los colores de la vacuna o virus de dicho organo
     */
     public Organo encontrarOrgano(Color color){
-        Organo organoEncontrado = null;
         for (int i = 0; i < cuerpo.size(); i++) {
-            organoEncontrado = cuerpo.get(i);
-            if(organoEncontrado.getColor().equals(color)){
-                return organoEncontrado;
+            if(this.cuerpo.get(i).getColor().equals(color)){
+                return this.cuerpo.get(i);
             }
         }
-        return organoEncontrado;
+        return null;
     }
 
     /* Agrega una carta al cuerpo del jugador, verifica que el organo no exista */

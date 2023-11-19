@@ -1,15 +1,21 @@
 package virus.game.controladores;
 
 import virus.game.modelos.*;
+import virus.game.modelos.medicinas.Medicina;
+import virus.game.modelos.organos.Organo;
+import virus.game.modelos.virus.Virus;
 import virus.game.observer.IObservador;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
+
+import java.util.Arrays;
 
 public class Controlador implements IObservador {
     private Juego modelo;
     private IVista vista;
     private Jugador jugador;
     private Jugador rival;
+    private AccionModelo accionModelo;
 
     public Controlador(Juego juego, IVista vista){
         this.modelo = juego;
@@ -21,12 +27,57 @@ public class Controlador implements IObservador {
         //modelo.iniciarJuego();
     }
 
-    public void accionarCarta(){
+    public boolean accionarCarta(int numCarta){
+        // Obtiene el indice de la carta que pidio jugar el usuario
+        // Es numCarta - 1 para acceder al indice del array de la mano del usuario
+        Carta cartaJugada = jugador.getMano().get(numCarta - 1);
+        boolean sePudoJugarUnaCarta = false;
 
+        if(cartaJugada instanceof Organo){
+            boolean sePudoJugarOrgano = modelo.jugarCarta(jugador, (Organo) cartaJugada);
+            if(sePudoJugarOrgano){
+                // Le doy 1 carta nueva si se pudo jugar el organo
+                modelo.darCartasFaltantesJugador(jugador, 1);
+                sePudoJugarUnaCarta = true;
+            }
+        } else {
+            if(cartaJugada instanceof Virus){
+                boolean sePudoJugarVirus =modelo.jugarCarta(jugador, (Virus) cartaJugada);
+                if(sePudoJugarVirus){
+                    // Le doy 1 carta nueva si se pudo jugar el virus
+                    modelo.darCartasFaltantesJugador(jugador, 1);
+                    sePudoJugarUnaCarta = true;
+                }
+            } else {
+                if(cartaJugada instanceof Medicina){
+                    boolean sePudoJugarMedicina = modelo.jugarCarta(jugador, (Medicina) cartaJugada);
+                    if(sePudoJugarMedicina){
+                        // Le doy 1 carta nueva si se pudo jugar la medicina
+                        modelo.darCartasFaltantesJugador(jugador, 1);
+                        sePudoJugarUnaCarta = true;
+                    }
+                }
+            }
+        }
+
+        // Notifico si se pudo jugar la carta en cuestión
+        if(sePudoJugarUnaCarta){
+            return true;
+        }
+        return false;
     }
 
-    public void descartarCartas(){
+    // Se ejecuta cuando el jugador quiere descartar cartas
+    public void descartarCartasJugador(int[] indicesDeCartas){
+        // Ordeno el array de forma ascendente
+        Arrays.sort(indicesDeCartas);
 
+        // Hago un ciclo que arranque por el ultimo elemento
+        for (int i = indicesDeCartas.length - 1; i >= 0; i--) {
+            Carta cartaADescartar = jugador.getMano().get(indicesDeCartas[i] - 1);
+            modelo.descartarCartaManoJugador(jugador, cartaADescartar);
+        }
+        modelo.darCartasFaltantesJugador(jugador, indicesDeCartas.length);
     }
 
     public int getCantidadDeCartasEnMazo(){
@@ -80,11 +131,10 @@ public class Controlador implements IObservador {
     @Override
     public void actualizar(Object accion) {
         if(accion instanceof AccionModelo){
-            Jugador jugadorActual = this.modelo.getTurnoJugador();
-
             switch ((AccionModelo) accion){
                 case INICIAR_JUEGO:
                 {
+                    avisarCambioDeTurno();
                     vista.mostrarMesa();
                     break;
                 }
@@ -93,9 +143,51 @@ public class Controlador implements IObservador {
                     vista.setAccionVista(AccionVista.NUEVO_JUGADOR);
                     break;
                 }
+                case ESPERAR_TURNO:
+                    // Cuando tiene que esperar su turno
+                    vista.mostrarMesa();
+                    avisarCambioDeTurno();
+                    break;
+                case ESPERAR_REGISTRO:{
+                    if(this.jugador != null){
+                        vista.avisarEsperaALosDemasJugadores();
+                    }
+                    break;
+                }
+                case INICIO_NUEVO_TURNO:{
+                    vista.mostrarMesa();
+                    avisarCambioDeTurno();
+                }
             }
         }
     }
 
+    public Jugador getTurnoJugador(){
+        return modelo.getTurnoJugador();
+    }
+
+    // Devuelve true si es el turno del jugador
+    public boolean esSuTurno(){
+        return modelo.getTurnoJugador().equals(this.jugador);
+    }
+
+    public void finDeTurno(){
+        modelo.cambiarTurnoJugador();
+    }
+
+    // Le otorga el control al jugador en la vista o le dice que espere su turno
+    private void avisarCambioDeTurno(){
+        if (modelo.getTurnoJugador() == null){
+            modelo.cambiarTurnoJugador();
+        }
+
+        if(modelo.getTurnoJugador().equals(this.jugador)){
+            //vista.avisarQueEsSuTurno();
+            vista.setAccionVista(AccionVista.TURNO_JUGADOR);
+        } else {
+            //vista.avisarQueNoEsSuTurno();
+            vista.setAccionVista(AccionVista.ESPERAR_TURNO);
+        }
+    }
 
 }

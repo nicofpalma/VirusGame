@@ -136,6 +136,10 @@ public class Mazo {
         cartas.add(carta);
     }
 
+    public void eliminarCarta(Carta carta){
+        cartas.remove(carta);
+    }
+
     public boolean estaVacio(){
         return cartas.isEmpty();
     }
