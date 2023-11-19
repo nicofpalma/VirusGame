@@ -6,8 +6,8 @@ import virus.game.modelos.Color;
 public abstract class Medicina extends Carta {
 
     // Constructor de la medicina
-    public Medicina(Color color, String rutaImagen){
-        super(color, rutaImagen);
+    public Medicina(Color color, String nombre){
+        super(color, nombre);
     }
 
 }

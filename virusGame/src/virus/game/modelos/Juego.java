@@ -161,9 +161,10 @@ public class Juego implements IObservable {
         agregarCartaAMazoDeDescartes(carta);
     }
 
-    /* Metodo que permite intecambiar el mazo de descartes con el mazo principal */
+    /* Metodo que permite intecambiar el mazo de descartes con el mazo principal
+    *  Cuando el mazo está vacío */
     public void intercambiarMazos(){
-        if(!mazo.getCartas().isEmpty()){
+        if(mazo.getCartas().isEmpty()){
             for (int i = 0; i < mazoDeDescarte.getCartas().size(); i++) {
                 // Envío cada carta del mazo de descarte, al mazo original.
                 // Esto pasa cuando el mazo está vacío unicamente.
@@ -179,11 +180,16 @@ public class Juego implements IObservable {
     }
 
     public void darCartasFaltantesJugador(Jugador jugador, int cantidad){
-        Carta[] cartasRobadas = mazo.darNCartas(cantidad);
-        for (int i = 0; i < cartasRobadas.length; i++) {
-            jugador.recibirCarta(cartasRobadas[i]);
-        }
+        for (int i = 0; i < cantidad; i++) {
+             Carta cartaParaDar = mazo.dar1Carta();
+             if(cartaParaDar == null){
+                 intercambiarMazos();
+                 cantidad++;
+             } else {
+                 jugador.recibirCarta(cartaParaDar);
+             }
 
+        }
     }
 
     @Override
@@ -213,6 +219,32 @@ public class Juego implements IObservable {
 
         notificarCambio(AccionModelo.INICIO_NUEVO_TURNO);
         return turnoJugador;
+    }
+
+    // Controlar si algun jugador está en condición de ser ganador
+    public void controlarGanador(){
+        for (int i = 0; i < jugadores.size(); i++) {
+            // Si el jugador tiene 4 organos, compruebo si ganó
+            Cuerpo cuerpoJugador = jugadores.get(i).getCuerpoJugador();
+            if(cuerpoJugador.getCuerpo().size() == 4){
+                boolean tieneAlgunaInfeccion = false;
+
+                // Ciclo sobre el cuerpo del jugador
+                for (int j = 0; j < 4; j++) {
+                    // Si tiene alguna infección, corto el ciclo
+                    if(!cuerpoJugador.getCuerpo().get(j).getInfecciones().isEmpty()){
+                        tieneAlgunaInfeccion = true;
+                        break;
+                    }
+                }
+
+                // Si no tiene ninguna infección, entonces ese jugador es el ganador :)
+                if(!tieneAlgunaInfeccion){
+                    this.ganador = jugadores.get(i);
+                    notificarCambio(AccionModelo.GAME_OVER);
+                }
+            }
+        }
     }
 
     public Mazo getMazoDeDescarte() {

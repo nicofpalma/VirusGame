@@ -154,6 +154,17 @@ public class Controlador implements IObservador {
                 case INICIO_NUEVO_TURNO:{
                     vista.mostrarMesa();
                     avisarCambioDeTurno();
+                    break;
+                }
+                case GAME_OVER:{
+                    Jugador jugadorGanador = modelo.getGanador();
+                    if(jugadorGanador.equals(this.jugador)){
+                        vista.avisarQueElJugadorGano();
+                    } else {
+                        vista.avisarQueElJugadorPerdio();
+                    }
+                    vista.setAccionVista(AccionVista.GAME_OVER);
+                    break;
                 }
             }
         }
@@ -168,8 +179,17 @@ public class Controlador implements IObservador {
         return modelo.getTurnoJugador().equals(this.jugador);
     }
 
+    // Controla el fin de turno, otorgandole el turno a otro jugador.
+    // También controla si hay un ganador
     public void finDeTurno(){
-        modelo.cambiarTurnoJugador();
+        modelo.controlarGanador();
+        if (modelo.getGanador() == null) {
+            modelo.cambiarTurnoJugador();
+        }
+    }
+
+    public Jugador getJugadorGanador(){
+        return modelo.getGanador();
     }
 
     // Le otorga el control al jugador en la vista o le dice que espere su turno
@@ -179,10 +199,8 @@ public class Controlador implements IObservador {
         }
 
         if(modelo.getTurnoJugador().equals(this.jugador)){
-            //vista.avisarQueEsSuTurno();
             vista.setAccionVista(AccionVista.TURNO_JUGADOR);
         } else {
-            //vista.avisarQueNoEsSuTurno();
             vista.setAccionVista(AccionVista.ESPERAR_TURNO);
         }
     }

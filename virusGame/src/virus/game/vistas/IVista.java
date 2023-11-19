@@ -34,4 +34,8 @@ public interface IVista {
     AccionVista getAccionVista();
 
     void elegirCartasADescartar();
+
+    void avisarQueElJugadorGano();
+
+    void avisarQueElJugadorPerdio();
 }

@@ -6,6 +6,6 @@ public class VirusCorazon extends Virus{
     // Constructor del virus del corazon
     public VirusCorazon(){
         // El virus del corazon es siempre rojo
-        super(Color.ROJO, "/view/img/virusCorazon.png");
+        super(Color.ROJO, "Virus del corazón");
     }
 }

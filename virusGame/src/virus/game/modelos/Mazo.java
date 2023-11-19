@@ -20,13 +20,11 @@ import java.util.List;
 public class Mazo {
     // Lista de cartas que guarda el mazo
     private ArrayList<Carta> cartas;
-    private boolean vacio = true;
 
     // Constructor del mazo
     public Mazo(boolean vacio) {
         cartas = new ArrayList<>();
         if (!vacio) {
-            this.vacio = false;
             // Los 20 organos
             insertarCartasDeOrganos();
 
@@ -74,12 +72,6 @@ public class Mazo {
                  * En ese momento, puedo intercambiar los mazos desde la clase
                  * Juego, que es la que conoce ambos mazos.
                  *
-                 * Otra solucion sería cortar el ciclo, devolver false o null
-                 * - Controlar ese caso desde la clase Juego
-                 * - Intercambiar los mazos y llamar a darNCartas devuelta.
-                 * con la cantidad de cartas que faltan por dar.
-                 * - Es una solución bastante rebuscada y poco optima
-                 * - La de arriba es mejor.
                  */
 
             }

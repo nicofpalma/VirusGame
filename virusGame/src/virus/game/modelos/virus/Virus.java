@@ -5,7 +5,7 @@ import virus.game.modelos.Color;
 
 public abstract class Virus extends Carta {
     // Constructor del virus
-    public Virus(Color color, String rutaImagen){
-        super(color, rutaImagen);
+    public Virus(Color color, String nombre){
+        super(color, nombre);
     }
 }

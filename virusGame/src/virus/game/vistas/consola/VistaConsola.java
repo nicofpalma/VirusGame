@@ -49,6 +49,10 @@ public class VistaConsola extends JFrame implements IVista {
                         elegirCartasADescartar();
                         break;
                     }
+                    case GAME_OVER: {
+                        mostrarTextoEnNuevaLinea("El juego ya terminó...");
+                        break;
+                    }
                     default: {
                         break;
                     }
@@ -56,6 +60,7 @@ public class VistaConsola extends JFrame implements IVista {
             }
         });
 
+        // Para el control de teclas. Lo uso sólo para permitir el uso de enter además de hacer click en el botón
         textoUsuario.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -75,7 +80,24 @@ public class VistaConsola extends JFrame implements IVista {
                 // No necesito programar este método
             }
         });
+    }
 
+    @Override
+    public void avisarQueElJugadorGano(){
+        mostrarTextoEnNuevaLinea("");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("¡FELICITACIONES " + controlador.getJugadorGanador().getNombre() + ", GANASTE EL JUEGO!");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("Para volver a jugar, cierre y vuelve a abrir el juego.");
+    }
+
+    @Override
+    public void avisarQueElJugadorPerdio(){
+        mostrarTextoEnNuevaLinea("");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("PERDISTE. LO SENTIMOS, " + controlador.getJugadorGanador().getNombre() + " ES EL GANADOR. TE DESEO MÁS SUERTE LA PRÓXIMA VEZ :)");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("Para volver a jugar, cierre y vuelve a abrir el juego.");
     }
 
     @Override
@@ -137,8 +159,7 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void vistaInicial(){
         borrarTexto();
-        mostrarTextoEnNuevaLinea("Juego de cartas VIRUS");
-        mostrarTextoEnNuevaLinea("--- Inicio del juego ---");
+        mostrarTextoEnNuevaLinea("¡Bienvenido al juego de cartas VIRUS!");
         mostrarTextoEnNuevaLinea("Para iniciar, ingrese su nombre a continuación: ");
         this.accionVista = AccionVista.NUEVO_JUGADOR;
     }
@@ -159,29 +180,25 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void mostrarMesa(){
-        borrarTexto();
-        mostrarCantidadDeCartasEnMazo();
+        borrarTexto();      // Limpia la consola
+        mostrarCantidadDeCartasEnMazo();  // Cantidad de cartas en mazo
         mostrarTextoEnMismaLinea("   ||   ");
-        mostrarCantidadDeCartasEnMazoDeDescartes();
+        mostrarCantidadDeCartasEnMazoDeDescartes();  // Cantidad de cartas en mazo descartes
 
-        //mostrarCartasManoRival();
-        mostrarCuerpoRival();
+        mostrarCuerpoRival();           // Cuerpo rival
         separadorLinea();
         mostrarTextoEnNuevaLinea("");
         mostrarTextoEnNuevaLinea("");
-        mostrarCuerpoJugador();
-        separadorLinea();
-        mostrarTextoEnNuevaLinea("");
-        mostrarTextoEnNuevaLinea("");
-
+        mostrarCuerpoJugador();         // Cuerpo jugador
         separadorLinea();
         separadorLinea();
-        mostrarElegirCarta();
-        mostrarCartasManoJugador();
+        mostrarCartasManoJugador();     // Cartas mano jugador
         separadorLinea();
+        mostrarElegirCarta();           // Opciones de acciones
         separadorLinea();
-        avisarTurno();
+        avisarTurno();                  // Avisar de quien es el turno
     }
+
 
     public void mostrarElegirCarta(){
         if(controlador.esSuTurno()){
@@ -270,6 +287,7 @@ public class VistaConsola extends JFrame implements IVista {
         }
         mostrarTextoEnNuevaLinea("");
     }
+
 
     /* Limpia toda la consola, elimina el texto */
     private void borrarTexto(){

@@ -7,6 +7,6 @@ public class MedicinaCorazon extends Medicina{
     // Constructo de la medicina del corazon
     public MedicinaCorazon(){
         // Las medicinas del corazon siempre son rojas
-        super(Color.ROJO, "/view/img/medicinaCorazon.png");
+        super(Color.ROJO, "Medicina del corazón");
     }
 }

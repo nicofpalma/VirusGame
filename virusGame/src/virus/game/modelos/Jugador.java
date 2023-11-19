@@ -43,9 +43,9 @@ public class Jugador {
         String cartas = "";
         for (int i = 0; i < mano.size(); i++) {
             if(i == mano.size() - 1){
-                cartas += "(" + (Integer.valueOf(i+1)) + ")" + mano.get(i).toString();
+                cartas += (Integer.valueOf(i+1)) + ") " + mano.get(i).toString();
             } else {
-                cartas += "(" + (Integer.valueOf(i+1)) + ")" + mano.get(i).toString() + "  ||  ";
+                cartas += (Integer.valueOf(i+1)) + ") " + mano.get(i).toString() + "  ||  ";
             }
         }
         return cartas;

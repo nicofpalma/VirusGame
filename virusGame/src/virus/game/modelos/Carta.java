@@ -6,29 +6,27 @@ import java.awt.*;
 public abstract class Carta {
     // Color de la carta
     private final Color color;
-    private Image imagen;
+
+    // Nombre de la carta
+    private final String nombre;
 
     // Constructor de la carta
-    public Carta(Color color, String rutaImagen){
+    public Carta(Color color, String nombre){
         this.color = color;
-        //cargarImagen(rutaImagen);
+        this.nombre = nombre;
     }
 
     @Override
     public String toString() {
-        return "[" + this.getClass().getSimpleName() + "]";
-    }
-
-    private void cargarImagen(String rutaImagen){
-        imagen = new ImageIcon(getClass().getResource(rutaImagen)).getImage();
-    }
-
-    public Image getImagen() {
-        return imagen;
+        return "[" + this.getNombre() + "]";
     }
 
     // Getter del color
     public Color getColor() {
         return color;
+    }
+
+    public String getNombre() {
+        return nombre;
     }
 }
