@@ -1,6 +1,8 @@
 package virus.game.modelos;
 
-public enum AccionModelo {
+import java.io.Serializable;
+
+public enum AccionModelo implements Serializable {
     INICIAR_JUEGO,
     NUEVO_JUGADOR,
     ESPERAR_TURNO,

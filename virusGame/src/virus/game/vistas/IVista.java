@@ -2,6 +2,8 @@ package virus.game.vistas;
 
 import virus.game.controladores.Controlador;
 
+import java.rmi.RemoteException;
+
 public interface IVista {
     void setControlador(Controlador controlador);
 
@@ -11,31 +13,31 @@ public interface IVista {
 
     void setAccionVista(AccionVista accion);
 
-    void mostrarCartasManoRival();
+    void mostrarCartasManoRival() throws RemoteException;
 
-    void mostrarCuerpoRival();
+    void mostrarCuerpoRival() throws RemoteException;
 
     void mostrarCuerpoJugador();
 
-    void mostrarCantidadDeCartasEnMazo();
+    void mostrarCantidadDeCartasEnMazo() throws RemoteException;
 
-    void mostrarCantidadDeCartasEnMazoDeDescartes();
+    void mostrarCantidadDeCartasEnMazoDeDescartes() throws RemoteException;
 
-    void mostrarMesa();
+    void mostrarMesa() throws RemoteException;
 
     void avisarEsperaALosDemasJugadores();
 
-    void avisarTurno();
+    void avisarTurno() throws RemoteException;
 
-    void jugadorRealizaUnaAccion();
+    void jugadorRealizaUnaAccion() throws RemoteException;
 
     void accionIncorrecta();
 
     AccionVista getAccionVista();
 
-    void elegirCartasADescartar();
+    void elegirCartasADescartar() throws RemoteException;
 
-    void avisarQueElJugadorGano();
+    void avisarQueElJugadorGano() throws RemoteException;
 
-    void avisarQueElJugadorPerdio();
+    void avisarQueElJugadorPerdio() throws RemoteException;
 }

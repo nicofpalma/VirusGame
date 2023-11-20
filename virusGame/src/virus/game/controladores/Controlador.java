@@ -5,29 +5,46 @@ import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
 import virus.game.observer.IObservador;
+import virus.game.rmimvc.cliente.IControladorRemoto;
+import virus.game.rmimvc.observer.IObservableRemoto;
+import virus.game.rmimvc.observer.IObservadorRemoto;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 
-public class Controlador implements IObservador {
+public class Controlador implements IControladorRemoto, IObservadorRemoto {
     private Juego modelo;
     private IVista vista;
     private Jugador jugador;
     private Jugador rival;
     private AccionModelo accionModelo;
 
-    public Controlador(Juego juego, IVista vista){
+    public <T extends IObservableRemoto> Controlador(Juego juego, IVista vista){
         this.modelo = juego;
         this.vista = vista;
         this.vista.setControlador(this);
         this.modelo.agregarObservador(this);
+
+        try {
+            this.setModeloRemoto(juego);
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
+
         this.jugador = null;
         this.rival = null;
         //modelo.iniciarJuego();
     }
 
-    public boolean accionarCarta(int numCarta){
+    @Override
+    public <T extends IObservableRemoto> void setModeloRemoto(T arg0) throws RemoteException{
+        this.modelo = (Juego) arg0;
+    }
+
+    public boolean accionarCarta(int numCarta) throws RemoteException {
         // Obtiene el indice de la carta que pidio jugar el usuario
         // Es numCarta - 1 para acceder al indice del array de la mano del usuario
         Carta cartaJugada = jugador.getMano().get(numCarta - 1);
@@ -65,7 +82,7 @@ public class Controlador implements IObservador {
     }
 
     // Se ejecuta cuando el jugador quiere descartar cartas
-    public void descartarCartasJugador(int[] indicesDeCartas){
+    public void descartarCartasJugador(int[] indicesDeCartas) throws RemoteException {
         // Ordeno el array de forma ascendente
         Arrays.sort(indicesDeCartas);
 
@@ -77,16 +94,16 @@ public class Controlador implements IObservador {
         modelo.darCartasFaltantesJugador(jugador, indicesDeCartas.length);
     }
 
-    public int getCantidadDeCartasEnMazo(){
+    public int getCantidadDeCartasEnMazo() throws RemoteException {
         return modelo.getMazo().cantidadDeCartasEnMazo();
     }
 
-    public int getCantidadDeCartasEnMazoDeDescartes(){
+    public int getCantidadDeCartasEnMazoDeDescartes() throws RemoteException {
         return modelo.getMazoDeDescarte().cantidadDeCartasEnMazo();
     }
 
     /* Agrega un nuevo jugador y tambien lo agrega al modelo */
-    public void nuevoJugador(String nombre){
+    public void nuevoJugador(String nombre) throws RemoteException {
         this.jugador = new Jugador(nombre);
         modelo.agregarJugador(jugador);
         modelo.iniciarJuego();
@@ -98,7 +115,7 @@ public class Controlador implements IObservador {
     }
 
     /* Obtiene el rival del jugador actual */
-    public Jugador getRival(){
+    public Jugador getRival() throws RemoteException {
         if(rival == null){
             rival = modelo.getRival(jugador);
         }
@@ -116,17 +133,17 @@ public class Controlador implements IObservador {
     }
 
     /* Devuelve el cuerpo del rival */
-    public Cuerpo getCuerpoRival(){
+    public Cuerpo getCuerpoRival() throws RemoteException {
         return getRival().getCuerpoJugador();
     }
 
     /* Devuelve el cuerpo del rival en un String concatenado */
-    public String getCuerpoRivalToString(){
+    public String getCuerpoRivalToString() throws RemoteException {
         return getCuerpoRival().toString();
     }
 
     @Override
-    public void actualizar(Object accion) {
+    public void actualizar(IObservableRemoto observable,Object accion) throws RemoteException {
         if(accion instanceof AccionModelo){
             switch ((AccionModelo) accion){
                 case INICIAR_JUEGO:
@@ -170,30 +187,30 @@ public class Controlador implements IObservador {
         }
     }
 
-    public Jugador getTurnoJugador(){
+    public Jugador getTurnoJugador() throws RemoteException {
         return modelo.getTurnoJugador();
     }
 
     // Devuelve true si es el turno del jugador
-    public boolean esSuTurno(){
+    public boolean esSuTurno() throws RemoteException {
         return modelo.getTurnoJugador().equals(this.jugador);
     }
 
     // Controla el fin de turno, otorgandole el turno a otro jugador.
     // También controla si hay un ganador
-    public void finDeTurno(){
+    public void finDeTurno() throws RemoteException {
         modelo.controlarGanador();
         if (modelo.getGanador() == null) {
             modelo.cambiarTurnoJugador();
         }
     }
 
-    public Jugador getJugadorGanador(){
+    public Jugador getJugadorGanador() throws RemoteException {
         return modelo.getGanador();
     }
 
     // Le otorga el control al jugador en la vista o le dice que espere su turno
-    private void avisarCambioDeTurno(){
+    private void avisarCambioDeTurno() throws RemoteException {
         if (modelo.getTurnoJugador() == null){
             modelo.cambiarTurnoJugador();
         }

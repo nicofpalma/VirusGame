@@ -3,38 +3,43 @@ package virus.game.modelos;
 import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
-import virus.game.observer.IObservable;
 import virus.game.observer.IObservador;
+import virus.game.rmimvc.observer.IObservableRemoto;
+import virus.game.rmimvc.observer.IObservadorRemoto;
+import virus.game.rmimvc.observer.ObservableRemoto;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
-public class Juego implements IObservable {
+public class Juego extends ObservableRemoto implements IJuego {
     private Mazo mazo;
     private Mazo mazoDeDescarte;
     private ArrayList<Jugador> jugadores;
     private Jugador ganador;
     private Jugador turnoJugador;
-    private ArrayList<IObservador> observadores;
+    private ArrayList<IObservadorRemoto> observadores;
 
     public Juego(){
         this.jugadores = new ArrayList<Jugador>();
-        this.observadores = new ArrayList<IObservador>();
+        this.observadores = new ArrayList<IObservadorRemoto>();
         this.mazo = new Mazo(false);
         this.mazoDeDescarte = new Mazo(true);
         this.ganador = null;
         this.turnoJugador = null;
     }
 
-    public void iniciarJuego(){
+    @Override
+    public void iniciarJuego() throws RemoteException{
         // Inicia el juego si ya hay 2 jugadores
-        if(jugadores.size() >= 2) this.notificarCambio(AccionModelo.INICIAR_JUEGO);
+        if(jugadores.size() >= 2) this.notificarObservadores(AccionModelo.INICIAR_JUEGO);
         else {
             // Notifica que espere el registro si no hay 2 jugadores
-            this.notificarCambio(AccionModelo.ESPERAR_REGISTRO);
+            this.notificarObservadores(AccionModelo.ESPERAR_REGISTRO);
         }
     }
 
-    public boolean jugarCarta(Jugador jugador, Organo organo){
+    @Override
+    public boolean jugarCarta(Jugador jugador, Organo organo) throws RemoteException{
         boolean organoAgregado = jugador.getCuerpoJugador().agregarOrganoAlCuerpo(organo);
         if (organoAgregado){
             jugador.eliminarCartaDeLaMano(organo);
@@ -46,7 +51,8 @@ public class Juego implements IObservable {
 
     /* Intenta aplicar una infeccion
     * Devuelve falso si es inmune o no existe el organo */
-    public boolean jugarCarta(Jugador jugador, Virus virus){
+    @Override
+    public boolean jugarCarta(Jugador jugador, Virus virus) throws RemoteException{
         Cuerpo cuerpoRival = getRival(jugador).getCuerpoJugador();
         Organo organoAfectado = cuerpoRival.infectarOrgano(virus);
         if(organoAfectado != null){
@@ -80,7 +86,8 @@ public class Juego implements IObservable {
     * En ese caso, lo cura. Devuelve true.
     * Si ya es inmune, no lo cura. Devuelve falso.
     * Si no existe, devuelve falso. */
-    public boolean jugarCarta(Jugador jugador, Medicina medicina){
+    @Override
+    public boolean jugarCarta(Jugador jugador, Medicina medicina) throws RemoteException{
         Organo organoACurar = jugador.getCuerpoJugador().encontrarOrgano(medicina.getColor());
         if(organoACurar != null){
             if(!organoACurar.esInmune()){
@@ -112,7 +119,8 @@ public class Juego implements IObservable {
      * Reinicia su estado
      * Coloca sus medicinas e infecciones en el mazo de descartes
      * */
-    public void extirparOrganoDelCuerpo(Jugador jugador, Organo organo){
+    @Override
+    public void extirparOrganoDelCuerpo(Jugador jugador, Organo organo) throws RemoteException{
         Organo organoExtirpado = jugador.getCuerpoJugador().extirparOrgano(organo);
         Virus[] infeccionesExtraidas = organoExtirpado.extraerInfecciones();
         Medicina[] medicinasExtraidas = organoExtirpado.extraerMedicinas();
@@ -128,7 +136,8 @@ public class Juego implements IObservable {
 
 
     /* Retorna el jugador rival, retorna nulo si no lo encuentra (controlar este caso) */
-    public Jugador getRival(Jugador jugador){
+    @Override
+    public Jugador getRival(Jugador jugador) throws RemoteException{
         Jugador jugadorRival = null;
         for (int i = 0; i < jugadores.size(); i++) {
             jugadorRival = jugadores.get(i);
@@ -140,7 +149,8 @@ public class Juego implements IObservable {
     }
 
     /* Agrego un nuevo jugador */
-    public void agregarJugador(Jugador jugador){
+    @Override
+    public void agregarJugador(Jugador jugador) throws RemoteException{
         dar3CartasJugador(jugador);
         jugadores.add(jugador);
     }
@@ -155,15 +165,16 @@ public class Juego implements IObservable {
     private void agregarCartaAMazoDeDescartes(Carta carta){
         mazoDeDescarte.agregarCarta(carta);
     }
-
-    public void descartarCartaManoJugador(Jugador jugador, Carta carta){
+    @Override
+    public void descartarCartaManoJugador(Jugador jugador, Carta carta) throws RemoteException{
         jugador.eliminarCartaDeLaMano(carta);
         agregarCartaAMazoDeDescartes(carta);
     }
 
     /* Metodo que permite intecambiar el mazo de descartes con el mazo principal
     *  Cuando el mazo está vacío */
-    public void intercambiarMazos(){
+    @Override
+    public void intercambiarMazos() throws RemoteException{
         if(mazo.getCartas().isEmpty()){
             for (int i = 0; i < mazoDeDescarte.getCartas().size(); i++) {
                 // Envío cada carta del mazo de descarte, al mazo original.
@@ -175,11 +186,8 @@ public class Juego implements IObservable {
         }
     }
 
-    private void dar1CartaJugador(Jugador jugador){
-        jugador.recibirCarta(mazo.dar1Carta());
-    }
-
-    public void darCartasFaltantesJugador(Jugador jugador, int cantidad){
+    @Override
+    public void darCartasFaltantesJugador(Jugador jugador, int cantidad) throws RemoteException{
         for (int i = 0; i < cantidad; i++) {
              Carta cartaParaDar = mazo.dar1Carta();
              if(cartaParaDar == null){
@@ -193,20 +201,31 @@ public class Juego implements IObservable {
     }
 
     @Override
-    public void notificarCambio(Object objeto){
-        for(IObservador observador : this.observadores){
-            observador.actualizar(objeto);
+    public void notificarObservadores(Object objeto) throws RemoteException {
+        for(IObservadorRemoto observador : this.observadores){
+            observador.actualizar(this, objeto);
         }
     }
 
     @Override
-    public void agregarObservador(IObservador observador){
+    public void notificarObservadores() throws RemoteException {
+
+    }
+
+    @Override
+    public void agregarObservador(IObservadorRemoto observador){
         this.observadores.add(observador);
+    }
+
+    @Override
+    public void removerObservador(IObservadorRemoto o) throws RemoteException {
+
     }
 
 
     /* Para terminar el turno de un jugador y dárselo al siguiente */
-    public Jugador cambiarTurnoJugador(){
+    @Override
+    public Jugador cambiarTurnoJugador() throws RemoteException {
         // Si el turno de jugador está en nulo, se le da el turno al primer jugador. Esto pasa solo al empezar el juego.
         if(turnoJugador == null){
             turnoJugador = jugadores.get(0);
@@ -217,12 +236,13 @@ public class Juego implements IObservable {
             turnoJugador = jugadores.get(indiceSiguiente);
         }
 
-        notificarCambio(AccionModelo.INICIO_NUEVO_TURNO);
+        notificarObservadores(AccionModelo.INICIO_NUEVO_TURNO);
         return turnoJugador;
     }
 
     // Controlar si algun jugador está en condición de ser ganador
-    public void controlarGanador(){
+    @Override
+    public void controlarGanador() throws RemoteException {
         for (int i = 0; i < jugadores.size(); i++) {
             // Si el jugador tiene 4 organos, compruebo si ganó
             Cuerpo cuerpoJugador = jugadores.get(i).getCuerpoJugador();
@@ -241,33 +261,39 @@ public class Juego implements IObservable {
                 // Si no tiene ninguna infección, entonces ese jugador es el ganador :)
                 if(!tieneAlgunaInfeccion){
                     this.ganador = jugadores.get(i);
-                    notificarCambio(AccionModelo.GAME_OVER);
+                    notificarObservadores(AccionModelo.GAME_OVER);
                 }
             }
         }
     }
 
-    public Mazo getMazoDeDescarte() {
+    @Override
+    public Mazo getMazoDeDescarte() throws RemoteException {
         return mazoDeDescarte;
     }
 
-    public Mazo getMazo() {
+    @Override
+    public Mazo getMazo() throws RemoteException{
         return mazo;
     }
 
-    public Jugador getGanador() {
+    @Override
+    public Jugador getGanador() throws RemoteException{
         return ganador;
     }
 
-    public Jugador getTurnoJugador() {
+    @Override
+    public Jugador getTurnoJugador() throws RemoteException{
         return turnoJugador;
     }
 
-    public ArrayList<IObservador> getObservadores() {
+    @Override
+    public ArrayList<IObservadorRemoto> getObservadores() throws RemoteException{
         return observadores;
     }
 
-    public ArrayList<Jugador> getJugadores() {
+    @Override
+    public ArrayList<Jugador> getJugadores() throws RemoteException{
         return jugadores;
     }
 

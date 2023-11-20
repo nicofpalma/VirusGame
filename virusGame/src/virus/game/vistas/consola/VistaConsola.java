@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.rmi.RemoteException;
 
 public class VistaConsola extends JFrame implements IVista {
     private JTextField textoUsuario;
@@ -33,20 +34,36 @@ public class VistaConsola extends JFrame implements IVista {
                 switch (accionVista){
                     case NUEVO_JUGADOR: {
                         borrarTexto();
-                        ingresarNuevoJugador();
+                        try {
+                            ingresarNuevoJugador();
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
                     }
                     case ESPERAR_TURNO:{
-                        mostrarMesa();
+                        try {
+                            mostrarMesa();
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         mostrarTextoEnNuevaLinea("No es tu turno, espera...");
                         break;
                     }
                     case TURNO_JUGADOR:{
-                        jugadorRealizaUnaAccion();
+                        try {
+                            jugadorRealizaUnaAccion();
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
                     }
                     case DESCARTAR_CARTAS:{
-                        elegirCartasADescartar();
+                        try {
+                            elegirCartasADescartar();
+                        } catch (RemoteException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         break;
                     }
                     case GAME_OVER: {
@@ -83,7 +100,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void avisarQueElJugadorGano(){
+    public void avisarQueElJugadorGano() throws RemoteException {
         mostrarTextoEnNuevaLinea("");
         separadorLinea();
         mostrarTextoEnNuevaLinea("¡FELICITACIONES " + controlador.getJugadorGanador().getNombre() + ", GANASTE EL JUEGO!");
@@ -92,7 +109,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void avisarQueElJugadorPerdio(){
+    public void avisarQueElJugadorPerdio() throws RemoteException {
         mostrarTextoEnNuevaLinea("");
         separadorLinea();
         mostrarTextoEnNuevaLinea("PERDISTE. LO SENTIMOS, " + controlador.getJugadorGanador().getNombre() + " ES EL GANADOR. TE DESEO MÁS SUERTE LA PRÓXIMA VEZ :)");
@@ -101,7 +118,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void jugadorRealizaUnaAccion(){
+    public void jugadorRealizaUnaAccion() throws RemoteException {
         // Controla que el numero de carta elegida sea 1, 2 o 3. Si es cero, es un descarte.
         // Si no es ninguno, muestro error.
         int numAccion = Integer.parseInt(textoUsuario.getText().trim());
@@ -126,7 +143,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void elegirCartasADescartar(){
+    public void elegirCartasADescartar() throws RemoteException {
         String indicesSeparadosConComa = textoUsuario.getText().trim();
 
         // Separo cada indice con coma
@@ -170,7 +187,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void avisarTurno(){
+    public void avisarTurno() throws RemoteException {
         if (controlador.esSuTurno()){
             mostrarTextoEnNuevaLinea("*** TU TURNO ***");
         } else {
@@ -179,7 +196,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void mostrarMesa(){
+    public void mostrarMesa() throws RemoteException {
         borrarTexto();      // Limpia la consola
         mostrarCantidadDeCartasEnMazo();  // Cantidad de cartas en mazo
         mostrarTextoEnMismaLinea("   ||   ");
@@ -200,7 +217,7 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
 
-    public void mostrarElegirCarta(){
+    public void mostrarElegirCarta() throws RemoteException {
         if(controlador.esSuTurno()){
             mostrarTextoEnNuevaLinea("Elige una carta (1, 2 o 3)  ||  Escribe 0 (cero) para descartar hasta 3 cartas");
         }
@@ -212,12 +229,12 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void mostrarCantidadDeCartasEnMazo(){
+    public void mostrarCantidadDeCartasEnMazo() throws RemoteException {
         mostrarTextoEnMismaLinea("Cantidad de cartas en MAZO: " + controlador.getCantidadDeCartasEnMazo());
     }
 
     @Override
-    public void mostrarCantidadDeCartasEnMazoDeDescartes(){
+    public void mostrarCantidadDeCartasEnMazoDeDescartes() throws RemoteException {
         mostrarTextoEnNuevaLinea("Cantidad de cartas en MAZO DE DESCARTES: " + controlador.getCantidadDeCartasEnMazoDeDescartes());
 
     }
@@ -242,14 +259,14 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
-    public void mostrarCartasManoRival() {
+    public void mostrarCartasManoRival() throws RemoteException {
         separadorLinea();
         mostrarTextoEnNuevaLinea("MANO DE " + controlador.getRival().getNombre() + " (RIVAL)");
         mostrarTextoEnNuevaLinea("  [Carta 1]  ||  [Carta 2]  ||  [Carta 3]  ");
     }
 
     @Override
-    public void mostrarCuerpoRival() {
+    public void mostrarCuerpoRival() throws RemoteException {
         separadorLinea();
         mostrarTextoEnNuevaLinea("CUERPO DE " + controlador.getRival().getNombre() + " (RIVAL)");
         String cuerpoRival = controlador.getCuerpoRivalToString();
@@ -260,7 +277,7 @@ public class VistaConsola extends JFrame implements IVista {
         }
     }
 
-    private void ingresarNuevoJugador(){
+    private void ingresarNuevoJugador() throws RemoteException {
         String nombre = textoUsuario.getText().trim();
         controlador.nuevoJugador(nombre);
         borrarInputUsuario();

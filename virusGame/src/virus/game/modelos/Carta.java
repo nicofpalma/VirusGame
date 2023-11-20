@@ -1,9 +1,8 @@
 package virus.game.modelos;
 
-import javax.swing.*;
-import java.awt.*;
+import java.io.Serializable;
 
-public abstract class Carta {
+public abstract class Carta implements Serializable {
     // Color de la carta
     private final Color color;
 

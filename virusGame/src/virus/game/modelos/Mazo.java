@@ -13,11 +13,12 @@ import virus.game.modelos.virus.VirusCorazon;
 import virus.game.modelos.virus.VirusEstomago;
 import virus.game.modelos.virus.VirusHueso;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Mazo {
+public class Mazo implements Serializable {
     // Lista de cartas que guarda el mazo
     private ArrayList<Carta> cartas;
 

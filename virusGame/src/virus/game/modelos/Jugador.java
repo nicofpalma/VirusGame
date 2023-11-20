@@ -1,10 +1,11 @@
 package virus.game.modelos;
 
 import virus.game.modelos.organos.Organo;
+import java.io.Serializable;
 
 import java.util.ArrayList;
 
-public class Jugador {
+public class Jugador implements Serializable{
     private String nombre;
     private static int cantidadJugadores;
     private int numeroDeJugador;

@@ -4,9 +4,10 @@ import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cuerpo {
+public class Cuerpo implements Serializable {
     private ArrayList<Organo> cuerpo;
 
     public Cuerpo(){
