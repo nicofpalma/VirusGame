@@ -89,6 +89,10 @@ public class Controlador implements IObservador {
     public void nuevoJugador(String nombre){
         this.jugador = new Jugador(nombre);
         modelo.agregarJugador(jugador);
+        //modelo.iniciarJuego();
+    }
+
+    public void iniciarControlador(){
         modelo.iniciarJuego();
     }
 
@@ -135,16 +139,6 @@ public class Controlador implements IObservador {
                     vista.mostrarMesa();
                     break;
                 }
-                case NUEVO_JUGADOR:
-                {
-                    vista.setAccionVista(AccionVista.NUEVO_JUGADOR);
-                    break;
-                }
-                case ESPERAR_TURNO:
-                    // Cuando tiene que esperar su turno
-                    vista.mostrarMesa();
-                    avisarCambioDeTurno();
-                    break;
                 case ESPERAR_REGISTRO:{
                     if(this.jugador != null){
                         vista.avisarEsperaALosDemasJugadores();
@@ -194,10 +188,12 @@ public class Controlador implements IObservador {
 
     // Le otorga el control al jugador en la vista o le dice que espere su turno
     private void avisarCambioDeTurno(){
+        // Sucede cuando es el primer turno
         if (modelo.getTurnoJugador() == null){
             modelo.cambiarTurnoJugador();
         }
 
+        // Avisa de quien es el turno
         if(modelo.getTurnoJugador().equals(this.jugador)){
             vista.setAccionVista(AccionVista.TURNO_JUGADOR);
         } else {

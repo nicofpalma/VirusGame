@@ -264,6 +264,7 @@ public class VistaConsola extends JFrame implements IVista {
         String nombre = textoUsuario.getText().trim();
         controlador.nuevoJugador(nombre);
         borrarInputUsuario();
+        controlador.iniciarControlador();
     }
 
     private String getNombreJugadorControlador(){
