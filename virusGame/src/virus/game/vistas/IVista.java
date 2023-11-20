@@ -2,9 +2,10 @@ package virus.game.vistas;
 
 import virus.game.controladores.Controlador;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
 
-public interface IVista {
+public interface IVista extends Serializable {
     void setControlador(Controlador controlador);
 
     void mostrarCartasManoJugador();
