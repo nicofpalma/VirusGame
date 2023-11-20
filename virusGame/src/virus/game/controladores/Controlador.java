@@ -148,6 +148,7 @@ public class Controlador implements IObservador {
                 }
                 case GAME_OVER:{
                     Jugador jugadorGanador = modelo.getGanador();
+                    vista.mostrarMesa();
                     if(jugadorGanador.equals(this.jugador)){
                         vista.avisarQueElJugadorGano();
                     } else {
