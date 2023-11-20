@@ -89,10 +89,6 @@ public class Controlador implements IObservador {
     public void nuevoJugador(String nombre){
         this.jugador = new Jugador(nombre);
         modelo.agregarJugador(jugador);
-        //modelo.iniciarJuego();
-    }
-
-    public void iniciarControlador(){
         modelo.iniciarJuego();
     }
 
