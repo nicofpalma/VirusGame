@@ -160,16 +160,6 @@ public class Controlador implements IControladorRemoto {
                     vista.mostrarMesa();
                     break;
                 }
-                case NUEVO_JUGADOR:
-                {
-                    vista.setAccionVista(AccionVista.NUEVO_JUGADOR);
-                    break;
-                }
-                case ESPERAR_TURNO:
-                    // Cuando tiene que esperar su turno
-                    vista.mostrarMesa();
-                    avisarCambioDeTurno();
-                    break;
                 case ESPERAR_REGISTRO:{
                     if(this.jugador != null){
                         vista.avisarEsperaALosDemasJugadores();

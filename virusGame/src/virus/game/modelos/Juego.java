@@ -209,9 +209,9 @@ public class Juego extends ObservableRemoto implements IJuego {
             int indiceActual = jugadores.indexOf(turnoJugador);
             int indiceSiguiente = (indiceActual + 1) % jugadores.size();
             turnoJugador = jugadores.get(indiceSiguiente);
+            notificarObservadores(AccionModelo.INICIO_NUEVO_TURNO);
         }
 
-        notificarObservadores(AccionModelo.INICIO_NUEVO_TURNO);
         return turnoJugador;
     }
 
