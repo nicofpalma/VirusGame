@@ -37,6 +37,7 @@ public class Mazo implements Serializable {
 
             // Mezclar el mazo
             mezclarMazo();
+
         }
     }
 
@@ -66,14 +67,6 @@ public class Mazo implements Serializable {
 
                 this.cartas.remove(cartas.size() - 1);
 
-                // TODO Controlar el caso de cartas faltantes en mazo
-                /* Una solucion posible sería usar el metodo "darUnaCarta"
-                 * Al usar este metodo, puedo intentar dar una carta, de una en una.
-                 * Si una de esas cartas no se dar, entonces el mazo está vacío.
-                 * En ese momento, puedo intercambiar los mazos desde la clase
-                 * Juego, que es la que conoce ambos mazos.
-                 *
-                 */
 
             }
         }

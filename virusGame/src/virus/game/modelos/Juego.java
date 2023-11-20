@@ -1,12 +1,9 @@
 package virus.game.modelos;
 
+import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
-import virus.game.observer.IObservador;
-import virus.game.rmimvc.observer.IObservableRemoto;
-import virus.game.rmimvc.observer.IObservadorRemoto;
-import virus.game.rmimvc.observer.ObservableRemoto;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -17,11 +14,11 @@ public class Juego extends ObservableRemoto implements IJuego {
     private ArrayList<Jugador> jugadores;
     private Jugador ganador;
     private Jugador turnoJugador;
-    private ArrayList<IObservadorRemoto> observadores;
+    //private ArrayList<IObservadorRemoto> observadores;
 
     public Juego(){
         this.jugadores = new ArrayList<Jugador>();
-        this.observadores = new ArrayList<IObservadorRemoto>();
+        //this.observadores = new ArrayList<IObservadorRemoto>();
         this.mazo = new Mazo(false);
         this.mazoDeDescarte = new Mazo(true);
         this.ganador = null;
@@ -31,10 +28,10 @@ public class Juego extends ObservableRemoto implements IJuego {
     @Override
     public void iniciarJuego() throws RemoteException{
         // Inicia el juego si ya hay 2 jugadores
-        if(jugadores.size() >= 2) this.notificarObservadores(AccionModelo.INICIAR_JUEGO);
+        if(jugadores.size() >= 2) notificarObservadores(AccionModelo.INICIAR_JUEGO);
         else {
             // Notifica que espere el registro si no hay 2 jugadores
-            this.notificarObservadores(AccionModelo.ESPERAR_REGISTRO);
+            notificarObservadores(AccionModelo.ESPERAR_REGISTRO);
         }
     }
 
@@ -153,6 +150,7 @@ public class Juego extends ObservableRemoto implements IJuego {
     public void agregarJugador(Jugador jugador) throws RemoteException{
         dar3CartasJugador(jugador);
         jugadores.add(jugador);
+        System.out.println("Jugador agregado: " + jugador);
     }
 
     /* Le da 3 cartas al jugador, se usa cuando se inicia un nuevo juego */
@@ -199,29 +197,6 @@ public class Juego extends ObservableRemoto implements IJuego {
 
         }
     }
-
-    @Override
-    public void notificarObservadores(Object objeto) throws RemoteException {
-        for(IObservadorRemoto observador : this.observadores){
-            observador.actualizar(this, objeto);
-        }
-    }
-
-    @Override
-    public void notificarObservadores() throws RemoteException {
-
-    }
-
-    @Override
-    public void agregarObservador(IObservadorRemoto observador){
-        this.observadores.add(observador);
-    }
-
-    @Override
-    public void removerObservador(IObservadorRemoto o) throws RemoteException {
-
-    }
-
 
     /* Para terminar el turno de un jugador y dárselo al siguiente */
     @Override
@@ -285,11 +260,6 @@ public class Juego extends ObservableRemoto implements IJuego {
     @Override
     public Jugador getTurnoJugador() throws RemoteException{
         return turnoJugador;
-    }
-
-    @Override
-    public ArrayList<IObservadorRemoto> getObservadores() throws RemoteException{
-        return observadores;
     }
 
     @Override

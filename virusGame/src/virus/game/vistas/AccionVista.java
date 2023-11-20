@@ -1,6 +1,8 @@
 package virus.game.vistas;
 
-public enum AccionVista {
+import java.io.Serializable;
+
+public enum AccionVista implements Serializable {
     NUEVO_JUGADOR,
     ESPERAR_TURNO,
     TURNO_JUGADOR,

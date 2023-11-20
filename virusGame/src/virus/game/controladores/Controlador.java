@@ -4,25 +4,23 @@ import virus.game.modelos.*;
 import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
-import virus.game.observer.IObservador;
-import virus.game.rmimvc.cliente.IControladorRemoto;
-import virus.game.rmimvc.observer.IObservableRemoto;
-import virus.game.rmimvc.observer.IObservadorRemoto;
+import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
-import java.rmi.Remote;
+
 import java.rmi.RemoteException;
 import java.util.Arrays;
 
-public class Controlador implements IControladorRemoto, IObservadorRemoto {
-    private Juego modelo;
+public class Controlador implements IControladorRemoto {
+    private IJuego modelo;
     private IVista vista;
     private Jugador jugador;
     private Jugador rival;
     private AccionModelo accionModelo;
 
-    public <T extends IObservableRemoto> Controlador(Juego juego, IVista vista){
+    public Controlador(IJuego juego, IVista vista) throws RemoteException {
         this.modelo = juego;
         this.vista = vista;
         this.vista.setControlador(this);
@@ -39,10 +37,14 @@ public class Controlador implements IControladorRemoto, IObservadorRemoto {
         //modelo.iniciarJuego();
     }
 
-    @Override
-    public <T extends IObservableRemoto> void setModeloRemoto(T arg0) throws RemoteException{
-        this.modelo = (Juego) arg0;
+    public Controlador(IVista vista){
+        this.vista = vista;
+        this.vista.setControlador(this);
+        this.vista.vistaInicial();
+        this.jugador = null;
+        this.rival = null;
     }
+
 
     public boolean accionarCarta(int numCarta) throws RemoteException {
         // Obtiene el indice de la carta que pidio jugar el usuario
@@ -141,6 +143,12 @@ public class Controlador implements IControladorRemoto, IObservadorRemoto {
     public String getCuerpoRivalToString() throws RemoteException {
         return getCuerpoRival().toString();
     }
+
+    @Override
+    public <T extends IObservableRemoto> void setModeloRemoto(T arg0) throws RemoteException{
+        this.modelo = (IJuego) arg0;
+    }
+
 
     @Override
     public void actualizar(IObservableRemoto observable,Object accion) throws RemoteException {

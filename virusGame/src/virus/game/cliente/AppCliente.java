@@ -1,17 +1,15 @@
 package virus.game.cliente;
 
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-
-import javax.swing.JOptionPane;
-
+import ar.edu.unlu.rmimvc.RMIMVCException;
+import ar.edu.unlu.rmimvc.Util;
+import ar.edu.unlu.rmimvc.cliente.Cliente;
 import virus.game.controladores.Controlador;
-import virus.game.servidor.AppServidor;
 import virus.game.vistas.IVista;
 import virus.game.vistas.consola.VistaConsola;
-import virus.game.rmimvc.RMIMVCException;
-import virus.game.rmimvc.Util;
-import virus.game.rmimvc.cliente.Cliente;
+
+import javax.swing.*;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 public class AppCliente {
     public static void main(String[] args) {
@@ -49,16 +47,14 @@ public class AppCliente {
                 8888
         );
         IVista vista = new VistaConsola();
-        Controlador controlador = new Controlador(AppServidor.getModelo(), vista);
+        Controlador controlador = new Controlador(vista);
         Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
-        vista.vistaInicial();
+        //vista.vistaInicial();
         try {
             c.iniciar(controlador);
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (RMIMVCException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

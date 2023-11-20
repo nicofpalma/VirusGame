@@ -2,7 +2,9 @@ package virus.game.modelos.medicinas;
 
 import virus.game.modelos.Color;
 
-public class MedicinaCerebro extends Medicina{
+import java.io.Serializable;
+
+public class MedicinaCerebro extends Medicina implements Serializable {
 
     // Constructor de la medicina del cerebro
     public MedicinaCerebro(){

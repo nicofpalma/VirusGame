@@ -3,10 +3,8 @@ package virus.game.modelos;
 import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
-import virus.game.rmimvc.observer.IObservableRemoto;
-import virus.game.rmimvc.observer.IObservadorRemoto;
+import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -42,7 +40,7 @@ public interface IJuego extends IObservableRemoto {
 
     Jugador getTurnoJugador() throws RemoteException;
 
-     ArrayList<IObservadorRemoto> getObservadores() throws RemoteException;
+     //ArrayList<IObservadorRemoto> getObservadores() throws RemoteException;
 
     public ArrayList<Jugador> getJugadores() throws RemoteException;
 }

@@ -37,7 +37,7 @@ public class VistaConsola extends JFrame implements IVista {
                         try {
                             ingresarNuevoJugador();
                         } catch (RemoteException ex) {
-                            throw new RuntimeException(ex);
+                            ex.printStackTrace();
                         }
                         break;
                     }
@@ -45,7 +45,7 @@ public class VistaConsola extends JFrame implements IVista {
                         try {
                             mostrarMesa();
                         } catch (RemoteException ex) {
-                            throw new RuntimeException(ex);
+                            ex.printStackTrace();
                         }
                         mostrarTextoEnNuevaLinea("No es tu turno, espera...");
                         break;
@@ -54,7 +54,7 @@ public class VistaConsola extends JFrame implements IVista {
                         try {
                             jugadorRealizaUnaAccion();
                         } catch (RemoteException ex) {
-                            throw new RuntimeException(ex);
+                            ex.printStackTrace();
                         }
                         break;
                     }
@@ -62,7 +62,7 @@ public class VistaConsola extends JFrame implements IVista {
                         try {
                             elegirCartasADescartar();
                         } catch (RemoteException ex) {
-                            throw new RuntimeException(ex);
+                            ex.printStackTrace();
                         }
                         break;
                     }

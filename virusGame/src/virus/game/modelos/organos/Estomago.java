@@ -2,7 +2,9 @@ package virus.game.modelos.organos;
 
 import virus.game.modelos.Color;
 
-public class Estomago extends Organo{
+import java.io.Serializable;
+
+public class Estomago extends Organo implements Serializable {
 
     // Constructor de estomago
     public Estomago(){

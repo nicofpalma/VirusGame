@@ -2,7 +2,9 @@ package virus.game.modelos.medicinas;
 
 import virus.game.modelos.Color;
 
-public class MedicinaHueso extends Medicina{
+import java.io.Serializable;
+
+public class MedicinaHueso extends Medicina implements Serializable {
 
     // Constructo de la medicina del hueso
     public MedicinaHueso(){

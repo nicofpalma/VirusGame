@@ -5,9 +5,10 @@ import virus.game.modelos.Color;
 import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.virus.Virus;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Organo extends Carta{
+public abstract class Organo extends Carta implements Serializable {
     // Solo pueden guardar 2 infecciones o vacunas como máximo
     private ArrayList<Virus> infecciones;
     private ArrayList<Medicina> medicinas;

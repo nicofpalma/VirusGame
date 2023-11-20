@@ -2,7 +2,9 @@ package virus.game.modelos.organos;
 
 import virus.game.modelos.Color;
 
-public class Hueso extends Organo{
+import java.io.Serializable;
+
+public class Hueso extends Organo implements Serializable {
     // Constructor de Hueso
     public Hueso(){
         // Los huesos son siempre amarillos

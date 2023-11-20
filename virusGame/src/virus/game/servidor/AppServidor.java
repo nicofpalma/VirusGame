@@ -1,19 +1,17 @@
 package virus.game.servidor;
 
-import java.util.ArrayList;
-import java.rmi.RemoteException;
-
+import virus.game.modelos.IJuego;
 import virus.game.modelos.Juego;
-import virus.game.rmimvc.ServidorRMI;
-import virus.game.rmimvc.RMIMVCException;
-import virus.game.rmimvc.Util;
-import virus.game.rmimvc.servidor.*;
+import ar.edu.unlu.rmimvc.RMIMVCException;
+import ar.edu.unlu.rmimvc.Util;
+import ar.edu.unlu.rmimvc.servidor.Servidor;
 
 import javax.swing.*;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 
 public class AppServidor {
-    public static Juego modelo;
 
     public static void main (String[] args){
         ArrayList<String> ips = Util.getIpDisponibles();
@@ -33,18 +31,14 @@ public class AppServidor {
                 null,
                 8888
         );
-        AppServidor.modelo = new Juego();
+        IJuego juego = new Juego();
         Servidor servidor = new Servidor(ip, Integer.parseInt(port));
         try {
-            servidor.iniciar(modelo);
+            servidor.iniciar(juego);
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (RMIMVCException e) {
             e.printStackTrace();
         }
-    }
-
-    public static Juego getModelo() {
-        return modelo;
     }
 }
