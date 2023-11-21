@@ -38,4 +38,8 @@ public interface IVista {
     void avisarQueElJugadorGano();
 
     void avisarQueElJugadorPerdio();
+
+    void mostrarTablaDeGanadores();
+
+    void mostrarReglas();
 }

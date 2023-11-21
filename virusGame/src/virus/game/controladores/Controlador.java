@@ -5,6 +5,7 @@ import virus.game.modelos.medicinas.Medicina;
 import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
 import virus.game.observer.IObservador;
+import virus.game.utils.SerializadorDeGanadores;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
@@ -196,6 +197,11 @@ public class Controlador implements IObservador {
         } else {
             vista.setAccionVista(AccionVista.ESPERAR_TURNO);
         }
+    }
+
+    public String buscarTablaDeGanadores(){
+        SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores();
+        return serializadorDeGanadores.generarStringDeGanadores();
     }
 
 }

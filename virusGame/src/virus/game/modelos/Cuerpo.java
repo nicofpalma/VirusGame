@@ -21,7 +21,7 @@ public class Cuerpo {
     public String toString() {
         String cuerpoString = "";
         for (int i = 0; i < organos.size(); i++) {
-            cuerpoString += organos.get(i).toString() + " ";
+            cuerpoString += organos.get(i).toString() + "      ";
         }
         return cuerpoString;
     }

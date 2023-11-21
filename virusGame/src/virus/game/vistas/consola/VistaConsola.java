@@ -5,6 +5,7 @@ import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -26,6 +27,9 @@ public class VistaConsola extends JFrame implements IVista {
         setSize(600, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+
+        areaTextoConsola.setBackground(Color.BLACK);
+        areaTextoConsola.setForeground(Color.WHITE);
 
         botonConfirmar.addActionListener(new ActionListener() {
             @Override
@@ -126,6 +130,36 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
+    public void mostrarTablaDeGanadores() {
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("  PARTIDAS ANTERIORES");
+       mostrarTextoEnNuevaLinea(controlador.buscarTablaDeGanadores());
+       separadorLinea();
+    }
+
+    @Override
+    public void mostrarReglas(){
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("  OBJETIVO Y REGLAS DEL JUEGO");
+        mostrarTextoEnNuevaLinea("  --> PARA GANAR: Tener en tu cuerpo (tu mesa) las 4 cartas de órganos diferentes, sin ninguna infección.");
+        mostrarTextoEnNuevaLinea("  --> ORGANOS: Cerebro, Corazón, Estómago y Hueso");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("  --> VIRUS: Los hay para cada órgano. Sirven para infectar los órganos del rival e impedir que éste gane.");
+        mostrarTextoEnNuevaLinea("  --> Si se aplican 2 virus sobre un órgano, éste se extirpará del cuerpo (se eliminará).");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea("  --> MEDICINAS: Las hay para cada órgano. Sirven para vacunar tus órganos, mantenerlos a salvo.");
+        mostrarTextoEnNuevaLinea("  --> Si se aplican 2 medicinas sobre un órgano, éste se volverá inmune a cualquier virus.");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea(" --> Si se aplica un virus sobre un órgano que está vacunado, éste eliminará esa vacuna.");
+        mostrarTextoEnNuevaLinea(" --> Si se aplica una medicina sobre un órgano que está infectado, éste eliminará ese virus.");
+        separadorLinea();
+        mostrarTextoEnNuevaLinea(" --> DESCARTAR CARTAS: Durante tu turno, presiona '0' para elegir qué cartas quieres descartar.");
+        mostrarTextoEnNuevaLinea(" --> En cada turno tendremos 3 cartas en la mano. Podés jugar una, o descartar hasta las 3 cartas.");
+        mostrarTextoEnNuevaLinea(" --> Habrá ocasiones en las que no podrás jugar ninguna carta, te verás obligado a descartar :)");
+        separadorLinea();
+    }
+
+    @Override
     public void elegirCartasADescartar(){
         String indicesSeparadosConComa = textoUsuario.getText().trim();
 
@@ -160,6 +194,9 @@ public class VistaConsola extends JFrame implements IVista {
     public void vistaInicial(){
         borrarTexto();
         mostrarTextoEnNuevaLinea("¡Bienvenido al juego de cartas VIRUS!");
+        mostrarReglas();
+        separadorLinea();
+        mostrarTablaDeGanadores();
         mostrarTextoEnNuevaLinea("Para iniciar, ingrese su nombre a continuación: ");
         this.accionVista = AccionVista.NUEVO_JUGADOR;
     }
@@ -184,13 +221,15 @@ public class VistaConsola extends JFrame implements IVista {
         mostrarCantidadDeCartasEnMazo();  // Cantidad de cartas en mazo
         mostrarTextoEnMismaLinea("   ||   ");
         mostrarCantidadDeCartasEnMazoDeDescartes();  // Cantidad de cartas en mazo descartes
+        separadorLinea();
+        separadorBarra();
 
         mostrarCuerpoRival();           // Cuerpo rival
         separadorLinea();
-        mostrarTextoEnNuevaLinea("");
-        mostrarTextoEnNuevaLinea("");
+        separadorBarra();
         mostrarCuerpoJugador();         // Cuerpo jugador
         separadorLinea();
+        separadorBarra();
         separadorLinea();
         mostrarCartasManoJugador();     // Cartas mano jugador
         separadorLinea();
@@ -202,7 +241,7 @@ public class VistaConsola extends JFrame implements IVista {
 
     public void mostrarElegirCarta(){
         if(controlador.esSuTurno()){
-            mostrarTextoEnNuevaLinea("Elige una carta (1, 2 o 3)  ||  Escribe 0 (cero) para descartar hasta 3 cartas");
+            mostrarTextoEnNuevaLinea("   Elige una carta (1, 2 o 3)  ||  Escribe 0 (cero) para descartar hasta 3 cartas");
         }
     }
 
@@ -213,7 +252,7 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void mostrarCantidadDeCartasEnMazo(){
-        mostrarTextoEnMismaLinea("Cantidad de cartas en MAZO: " + controlador.getCantidadDeCartasEnMazo());
+        mostrarTextoEnMismaLinea("   Cantidad de cartas en MAZO: " + controlador.getCantidadDeCartasEnMazo());
     }
 
     @Override
@@ -225,20 +264,20 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void mostrarCuerpoJugador(){
         separadorLinea();
-        mostrarTextoEnNuevaLinea("CUERPO DE " + controlador.getJugador().getNombre() + " (TÚ)");
+        mostrarTextoEnNuevaLinea("   ----> CUERPO DE " + controlador.getJugador().getNombre() + " (TÚ) <----");
         String cuerpoJugador = controlador.getCuerpoJugadorToString();
         if(!cuerpoJugador.isEmpty()){
-            mostrarTextoEnNuevaLinea(cuerpoJugador);
+            mostrarTextoEnNuevaLinea("   " + cuerpoJugador);
         } else {
-            mostrarTextoEnNuevaLinea("*** CUERPO VACÍO ***");
+            mostrarTextoEnNuevaLinea("   [ CUERPO VACÍO ]  ");
         }
     }
 
 
     @Override
     public void mostrarCartasManoJugador() {
-        mostrarTextoEnNuevaLinea("TU MANO:");
-        mostrarTextoEnNuevaLinea(controlador.getJugador().verCartasMano());
+        mostrarTextoEnNuevaLinea("   TU MANO:");
+        mostrarTextoEnNuevaLinea("   " + controlador.getJugador().verCartasMano());
     }
 
     @Override
@@ -251,12 +290,12 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void mostrarCuerpoRival() {
         separadorLinea();
-        mostrarTextoEnNuevaLinea("CUERPO DE " + controlador.getRival().getNombre() + " (RIVAL)");
+        mostrarTextoEnNuevaLinea("   CUERPO DE " + controlador.getRival().getNombre() + " (RIVAL)");
         String cuerpoRival = controlador.getCuerpoRivalToString();
         if (!cuerpoRival.isEmpty()) {
-            mostrarTextoEnNuevaLinea(cuerpoRival);
+            mostrarTextoEnNuevaLinea("   " + cuerpoRival);
         } else {
-            mostrarTextoEnNuevaLinea("*** CUERPO VACÍO ***");
+            mostrarTextoEnNuevaLinea("   [ CUERPO VACÍO ]  ");
         }
     }
 
@@ -286,6 +325,17 @@ public class VistaConsola extends JFrame implements IVista {
             mostrarTextoEnMismaLinea("-");
         }
         mostrarTextoEnNuevaLinea("");
+    }
+
+    private void separadorBarra(){
+        mostrarTextoEnMismaLinea(" ");
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i < panel.size().width/13; i++) {
+                mostrarTextoEnMismaLinea(" = ");
+            }
+            mostrarTextoEnNuevaLinea("");
+            mostrarTextoEnMismaLinea(" ");
+        }
     }
 
 

@@ -5,6 +5,7 @@ import virus.game.modelos.organos.Organo;
 import virus.game.modelos.virus.Virus;
 import virus.game.observer.IObservable;
 import virus.game.observer.IObservador;
+import virus.game.utils.SerializadorDeGanadores;
 
 import java.util.ArrayList;
 
@@ -242,6 +243,9 @@ public class Juego implements IObservable {
                 // Si no tiene ninguna infección, entonces ese jugador es el ganador :)
                 if(!tieneAlgunaInfeccion){
                     this.ganador = jugadores.get(i);
+                    String nombreGanador = ganador.getNombre();
+                    String nombrePerdedor = getRival(ganador).getNombre();
+                    SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
                     notificarCambio(AccionModelo.GAME_OVER);
                 }
             }
