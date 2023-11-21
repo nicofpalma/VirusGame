@@ -7,27 +7,23 @@ import virus.game.modelos.virus.Virus;
 import java.util.ArrayList;
 
 public class Cuerpo {
-    private ArrayList<Organo> cuerpo;
+    private ArrayList<Organo> organos;
 
     public Cuerpo(){
-        this.cuerpo = new ArrayList<Organo>();
+        this.organos = new ArrayList<Organo>();
     }
 
-    public ArrayList<Organo> getCuerpo() {
-        return cuerpo;
+    public ArrayList<Organo> getOrganos() {
+        return organos;
     }
 
     @Override
     public String toString() {
         String cuerpoString = "";
-        for (int i = 0; i < cuerpo.size(); i++) {
-            cuerpoString += cuerpo.get(i).toString() + " ";
+        for (int i = 0; i < organos.size(); i++) {
+            cuerpoString += organos.get(i).toString() + " ";
         }
         return cuerpoString;
-    }
-
-    public int getCantidadDeOrganosEnElCuerpo(){
-        return cuerpo.size();
     }
 
     /*
@@ -48,7 +44,7 @@ public class Cuerpo {
 
     public Organo extirparOrgano(Organo organo){
         Organo organoExtirpado = encontrarOrgano(organo.getColor());
-        cuerpo.remove(organoExtirpado);
+        organos.remove(organoExtirpado);
         return organoExtirpado;
     }
 
@@ -80,9 +76,9 @@ public class Cuerpo {
     * Los colores de los organos coinciden con los colores de la vacuna o virus de dicho organo
     */
     public Organo encontrarOrgano(Color color){
-        for (int i = 0; i < cuerpo.size(); i++) {
-            if(this.cuerpo.get(i).getColor().equals(color)){
-                return this.cuerpo.get(i);
+        for (int i = 0; i < organos.size(); i++) {
+            if(this.organos.get(i).getColor().equals(color)){
+                return this.organos.get(i);
             }
         }
         return null;
@@ -90,15 +86,15 @@ public class Cuerpo {
 
     /* Agrega una carta al cuerpo del jugador, verifica que el organo no exista */
     public boolean agregarOrganoAlCuerpo(Organo organo){
-        if(cuerpo.size() < 4){ // Verificación que el cuerpo tenga menos de 4 cartas (es la condición de que el jugador gane)
-            for (int i = 0; i < cuerpo.size(); i++) {
+        if(organos.size() < 4){ // Verificación que el cuerpo tenga menos de 4 cartas (es la condición de que el jugador gane)
+            for (int i = 0; i < organos.size(); i++) {
                 // Verifica que el organo no exista en el cuerpo, lo comparo con el color.
                 // Si existe, retorno falso y no lo agrego
-                if(cuerpo.get(i).getColor().equals(organo.getColor())){
+                if(organos.get(i).getColor().equals(organo.getColor())){
                     return false;
                 }
             }
-            cuerpo.add(organo);      // Si no existe, lo agrego.
+            organos.add(organo);      // Si no existe, lo agrego.
         } else {
             return false;
         }

@@ -48,37 +48,6 @@ public class Mazo {
         return cartas;
     }
 
-    public Carta[] darNCartas(int cantidad) {
-        Carta[] cartasParaDar = new Carta[cantidad];
-
-        // Si la cantidad de cartas en el mazo es mayor a la cantidad pedida
-        if (cantidadDeCartasEnMazo() > cantidad) {
-            for (int i = 0; i < cantidad; i++) {
-                // voy sacando las cartas desde la última
-                // Que en la vida real sería la carta superior del mazo, cuando el
-                // Mazo está boca abajo.
-                Carta cartaParaDar = this.cartas.get(cartas.size() - 1);
-                if(cartaParaDar == null){
-
-                }
-                cartasParaDar[i] = this.cartas.get(cartas.size() - 1);
-
-                this.cartas.remove(cartas.size() - 1);
-
-                // TODO Controlar el caso de cartas faltantes en mazo
-                /* Una solucion posible sería usar el metodo "darUnaCarta"
-                 * Al usar este metodo, puedo intentar dar una carta, de una en una.
-                 * Si una de esas cartas no se dar, entonces el mazo está vacío.
-                 * En ese momento, puedo intercambiar los mazos desde la clase
-                 * Juego, que es la que conoce ambos mazos.
-                 *
-                 */
-
-            }
-        }
-        return cartasParaDar;
-    }
-
     /* Metodo para dar 1 carta */
     public Carta dar1Carta(){
         Carta cartaParaDar = null;
@@ -118,13 +87,6 @@ public class Mazo {
             cartas.add(new Estomago());
             cartas.add(new Hueso());
             cartas.add(new Corazon());
-        }
-    }
-
-    public void verMazo(){
-        // Recorro el mazo y lo veo, solo para fines de desarrollo
-        for (int i = 0; i < cartas.size(); i++) {
-            System.out.println(i + ": " + cartas.get(i).getClass().getSimpleName());
         }
     }
 

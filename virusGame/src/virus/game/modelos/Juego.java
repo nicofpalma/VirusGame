@@ -227,13 +227,13 @@ public class Juego implements IObservable {
         for (int i = 0; i < jugadores.size(); i++) {
             // Si el jugador tiene 4 organos, compruebo si ganó
             Cuerpo cuerpoJugador = jugadores.get(i).getCuerpoJugador();
-            if(cuerpoJugador.getCuerpo().size() == 4){
+            if(cuerpoJugador.getOrganos().size() == 4){
                 boolean tieneAlgunaInfeccion = false;
 
                 // Ciclo sobre el cuerpo del jugador
                 for (int j = 0; j < 4; j++) {
                     // Si tiene alguna infección, corto el ciclo
-                    if(!cuerpoJugador.getCuerpo().get(j).getInfecciones().isEmpty()){
+                    if(!cuerpoJugador.getOrganos().get(j).getInfecciones().isEmpty()){
                         tieneAlgunaInfeccion = true;
                         break;
                     }

@@ -2,6 +2,7 @@ package virus.game;
 
 import virus.game.controladores.Controlador;
 import virus.game.modelos.Juego;
+import virus.game.vistas.IVista;
 import virus.game.vistas.consola.VistaConsola;
 
 import javax.swing.*;
@@ -11,8 +12,8 @@ public class EjecucionJuegoVirus {
     {
         SwingUtilities.invokeLater(() -> {
             // Genero las vistas de consola
-            VistaConsola vista1 = new VistaConsola();
-            VistaConsola vista2 = new VistaConsola();
+            IVista vista1 = new VistaConsola();
+            IVista vista2 = new VistaConsola();
 
             // Creo el modelo del juego y lo asigno a cada controlador, con cada vista
             Juego modelo = new Juego();

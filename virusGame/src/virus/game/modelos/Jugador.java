@@ -34,9 +34,6 @@ public class Jugador {
         return mano;
     }
 
-    public int getCantidadDeCartasMano(){
-        return mano.size();
-    }
 
     /* Retorna las cartas de la mano en un string concatenado */
     public String verCartasMano(){
