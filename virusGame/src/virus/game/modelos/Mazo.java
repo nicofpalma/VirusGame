@@ -93,10 +93,6 @@ public class Mazo {
         cartas.clear();
     }
 
-    public int cantidadDeCartasEnMazo(){
-        return cartas.size();
-    }
-
     public void agregarCarta(Carta carta){
         cartas.add(carta);
     }

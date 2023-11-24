@@ -1,15 +1,13 @@
 package virus.game.controladores;
 
-import virus.game.modelos.*;
-import virus.game.modelos.cartas.Medicina;
-import virus.game.modelos.cartas.Organo;
-import virus.game.modelos.cartas.Virus;
+import virus.game.modelos.AccionModelo;
+import virus.game.modelos.Cuerpo;
+import virus.game.modelos.Juego;
+import virus.game.modelos.Jugador;
 import virus.game.observer.IObservador;
 import virus.game.utils.SerializadorDeGanadores;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
-
-import java.util.Arrays;
 
 public class Controlador implements IObservador {
     private Juego modelo;
@@ -29,61 +27,23 @@ public class Controlador implements IObservador {
     }
 
     public boolean accionarCarta(int numCarta){
-        // Obtiene el indice de la carta que pidio jugar el usuario
-        // Es numCarta - 1 para acceder al indice del array de la mano del usuario
-        Carta cartaJugada = jugador.getMano().get(numCarta - 1);
-        boolean sePudoJugarUnaCarta = false;
-
-        if(cartaJugada instanceof Organo){
-            boolean sePudoJugarOrgano = modelo.jugarCarta(jugador, (Organo) cartaJugada);
-            if(sePudoJugarOrgano){
-                // Le doy 1 carta nueva si se pudo jugar el organo
-                modelo.darCartasFaltantesJugador(jugador, 1);
-                sePudoJugarUnaCarta = true;
-            }
-        } else {
-            if(cartaJugada instanceof Virus){
-                boolean sePudoJugarVirus =modelo.jugarCarta(jugador, (Virus) cartaJugada);
-                if(sePudoJugarVirus){
-                    // Le doy 1 carta nueva si se pudo jugar el virus
-                    modelo.darCartasFaltantesJugador(jugador, 1);
-                    sePudoJugarUnaCarta = true;
-                }
-            } else {
-                if(cartaJugada instanceof Medicina){
-                    boolean sePudoJugarMedicina = modelo.jugarCarta(jugador, (Medicina) cartaJugada);
-                    if(sePudoJugarMedicina){
-                        // Le doy 1 carta nueva si se pudo jugar la medicina
-                        modelo.darCartasFaltantesJugador(jugador, 1);
-                        sePudoJugarUnaCarta = true;
-                    }
-                }
-            }
-        }
-
-        // Notifico si se pudo jugar la carta en cuestión
-        return sePudoJugarUnaCarta;
+        // Llama al método del modelo realizarAccionDeCarta
+        // Este método contiene todas las acciones posibles que puede realizar
+        // El jugador, y detecta qué tipo de carta es jugada.
+        return modelo.realizarAccionDeCarta(this.jugador, numCarta);
     }
 
     // Se ejecuta cuando el jugador quiere descartar cartas
-    public void descartarCartasJugador(int[] indicesDeCartas){
-        // Ordeno el array de forma ascendente
-        Arrays.sort(indicesDeCartas);
-
-        // Hago un ciclo que arranque por el ultimo elemento
-        for (int i = indicesDeCartas.length - 1; i >= 0; i--) {
-            Carta cartaADescartar = jugador.getMano().get(indicesDeCartas[i] - 1);
-            modelo.descartarCartaManoJugador(jugador, cartaADescartar);
-        }
-        modelo.darCartasFaltantesJugador(jugador, indicesDeCartas.length);
+    public void descartarCartas(int[] indicesDeCartas){
+        modelo.descartarCartaManoJugador(jugador, indicesDeCartas);
     }
 
     public int getCantidadDeCartasEnMazo(){
-        return modelo.getMazo().cantidadDeCartasEnMazo();
+        return modelo.cantidadDeCartasEnMazo();
     }
 
     public int getCantidadDeCartasEnMazoDeDescartes(){
-        return modelo.getMazoDeDescarte().cantidadDeCartasEnMazo();
+        return modelo.cantidadDeCartasEnMazoDeDescartes();
     }
 
     /* Agrega un nuevo jugador y tambien lo agrega al modelo */

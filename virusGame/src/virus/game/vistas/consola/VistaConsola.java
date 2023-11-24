@@ -174,7 +174,7 @@ public class VistaConsola extends JFrame implements IVista {
             for (int i = 0; i < indicesStr.length; i++) {
                 indicesCartasADescartar[i] = Integer.parseInt(indicesStr[i].trim());
             }
-            controlador.descartarCartasJugador(indicesCartasADescartar);
+            controlador.descartarCartas(indicesCartasADescartar);
             controlador.finDeTurno();
         }
         borrarInputUsuario();

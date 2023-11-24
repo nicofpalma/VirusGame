@@ -8,6 +8,7 @@ import virus.game.observer.IObservador;
 import virus.game.utils.SerializadorDeGanadores;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Juego implements IObservable {
     private Mazo mazo;
@@ -33,6 +34,42 @@ public class Juego implements IObservable {
             // Notifica que espere el registro si no hay 2 jugadores
             this.notificarCambio(AccionModelo.ESPERAR_REGISTRO);
         }
+    }
+
+    public boolean realizarAccionDeCarta(Jugador jugador, int numCarta){
+        // Obtiene el índice de la carta que pidio jugar el usuario
+        // Es numCarta - 1 para acceder al índice del array de la mano del usuario
+        Carta cartaJugada = jugador.getMano().get(numCarta - 1);
+        boolean sePudoJugarUnaCarta = false;
+
+        if(cartaJugada instanceof Organo){
+            boolean sePudoJugarOrgano = jugarCarta(jugador, (Organo) cartaJugada);
+            if(sePudoJugarOrgano){
+                // Le doy 1 carta nueva si se pudo jugar el organo
+                darCartasFaltantesJugador(jugador, 1);
+                sePudoJugarUnaCarta = true;
+            }
+        } else {
+            if(cartaJugada instanceof Virus){
+                boolean sePudoJugarVirus = jugarCarta(jugador, (Virus) cartaJugada);
+                if(sePudoJugarVirus){
+                    // Le doy 1 carta nueva si se pudo jugar el virus
+                    darCartasFaltantesJugador(jugador, 1);
+                    sePudoJugarUnaCarta = true;
+                }
+            } else {
+                if(cartaJugada instanceof Medicina){
+                    boolean sePudoJugarMedicina = jugarCarta(jugador, (Medicina) cartaJugada);
+                    if(sePudoJugarMedicina){
+                        // Le doy 1 carta nueva si se pudo jugar la medicina
+                        darCartasFaltantesJugador(jugador, 1);
+                        sePudoJugarUnaCarta = true;
+                    }
+                }
+            }
+        }
+        // Notifico si se pudo jugar la carta en cuestión
+        return sePudoJugarUnaCarta;
     }
 
     public boolean jugarCarta(Jugador jugador, Organo organo){
@@ -157,9 +194,17 @@ public class Juego implements IObservable {
         mazoDeDescarte.agregarCarta(carta);
     }
 
-    public void descartarCartaManoJugador(Jugador jugador, Carta carta){
-        jugador.eliminarCartaDeLaMano(carta);
-        agregarCartaAMazoDeDescartes(carta);
+    public void descartarCartaManoJugador(Jugador jugador, int[] indicesDeCartas){
+        // Ordeno el array de forma ascendente
+        Arrays.sort(indicesDeCartas);
+
+        // Hago un ciclo que arranque por el ultimo elemento
+        for (int i = indicesDeCartas.length - 1; i >= 0; i--) {
+            Carta cartaADescartar = jugador.getMano().get(indicesDeCartas[i] - 1);
+            jugador.eliminarCartaDeLaMano(cartaADescartar);
+            agregarCartaAMazoDeDescartes(cartaADescartar);
+        }
+        darCartasFaltantesJugador(jugador, indicesDeCartas.length);
     }
 
     /* Metodo que permite intecambiar el mazo de descartes con el mazo principal
@@ -251,6 +296,15 @@ public class Juego implements IObservable {
             }
         }
     }
+
+    public int cantidadDeCartasEnMazo(){
+        return getMazo().getCartas().size();
+    }
+
+    public int cantidadDeCartasEnMazoDeDescartes(){
+        return getMazoDeDescarte().getCartas().size();
+    }
+
 
     public Mazo getMazoDeDescarte() {
         return mazoDeDescarte;
