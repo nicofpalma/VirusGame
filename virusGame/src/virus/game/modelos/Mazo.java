@@ -1,17 +1,8 @@
 package virus.game.modelos;
 
-import virus.game.modelos.medicinas.MedicinaCerebro;
-import virus.game.modelos.medicinas.MedicinaCorazon;
-import virus.game.modelos.medicinas.MedicinaEstomago;
-import virus.game.modelos.medicinas.MedicinaHueso;
-import virus.game.modelos.organos.Cerebro;
-import virus.game.modelos.organos.Corazon;
-import virus.game.modelos.organos.Estomago;
-import virus.game.modelos.organos.Hueso;
-import virus.game.modelos.virus.VirusCerebro;
-import virus.game.modelos.virus.VirusCorazon;
-import virus.game.modelos.virus.VirusEstomago;
-import virus.game.modelos.virus.VirusHueso;
+import virus.game.modelos.cartas.Medicina;
+import virus.game.modelos.cartas.Organo;
+import virus.game.modelos.cartas.Virus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,30 +54,31 @@ public class Mazo {
     private void insertarCartasDeVirus(){
         // 4 cartas de cada virus
         for (int i = 0; i < 4; i++) {
-            cartas.add(new VirusCorazon());
-            cartas.add(new VirusEstomago());
-            cartas.add(new VirusCerebro());
-            cartas.add(new VirusHueso());
+            cartas.add(new Virus(Color.ROJO, "Virus del corazón"));
+            cartas.add(new Virus(Color.VERDE, "Virus del estómago"));
+            cartas.add(new Virus(Color.AZUL, "Virus del cerebro"));
+            cartas.add(new Virus(Color.AMARILLO, "Virus del hueso"));
         }
     }
 
     private void insertarCartasDeMedicinas(){
         // 4 cartas de cada medicina
         for (int i = 0; i < 4; i++) {
-            cartas.add(new MedicinaCorazon());
-            cartas.add(new MedicinaEstomago());
-            cartas.add(new MedicinaCerebro());
-            cartas.add(new MedicinaHueso());
+            cartas.add(new Medicina(Color.ROJO, "Medicina del corazón"));
+            cartas.add(new Medicina(Color.VERDE, "Medicina del estómago"));
+            cartas.add(new Medicina(Color.AZUL, "Medicina del cerebro"));
+            cartas.add(new Medicina(Color.AMARILLO, "Medicina del hueso"));
+
         }
     }
 
     private void insertarCartasDeOrganos(){
         // 5 cartas de cada organo
         for (int i = 0; i < 5; i++) {
-            cartas.add(new Cerebro());
-            cartas.add(new Estomago());
-            cartas.add(new Hueso());
-            cartas.add(new Corazon());
+            cartas.add(new Organo(Color.AZUL, "Cerebro"));
+            cartas.add(new Organo(Color.VERDE, "Estómago"));
+            cartas.add(new Organo(Color.AMARILLO, "Hueso"));
+            cartas.add(new Organo(Color.ROJO, "Corazón"));
         }
     }
 

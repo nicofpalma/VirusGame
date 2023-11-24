@@ -1,13 +1,11 @@
-package virus.game.modelos.organos;
+package virus.game.modelos.cartas;
 
 import virus.game.modelos.Carta;
 import virus.game.modelos.Color;
-import virus.game.modelos.medicinas.Medicina;
-import virus.game.modelos.virus.Virus;
 
 import java.util.ArrayList;
 
-public abstract class Organo extends Carta{
+public final class Organo extends Carta{
     // Solo pueden guardar 2 infecciones o vacunas como máximo
     private ArrayList<Virus> infecciones;
     private ArrayList<Medicina> medicinas;
@@ -27,7 +25,7 @@ public abstract class Organo extends Carta{
 
     @Override
     public String toString() {
-        String nombreOrgano = "[" + this.getClass().getSimpleName();
+        String nombreOrgano = "[" + this.getNombre();
         if(!infecciones.isEmpty()){
             nombreOrgano += " -INFECTADO";
         }

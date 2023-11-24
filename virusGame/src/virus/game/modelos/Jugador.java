@@ -1,6 +1,6 @@
 package virus.game.modelos;
 
-import virus.game.modelos.organos.Organo;
+import virus.game.modelos.cartas.Organo;
 
 import java.util.ArrayList;
 

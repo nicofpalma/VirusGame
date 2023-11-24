@@ -1,8 +1,8 @@
 package virus.game.modelos;
 
-import virus.game.modelos.medicinas.Medicina;
-import virus.game.modelos.organos.Organo;
-import virus.game.modelos.virus.Virus;
+import virus.game.modelos.cartas.Medicina;
+import virus.game.modelos.cartas.Organo;
+import virus.game.modelos.cartas.Virus;
 
 import java.util.ArrayList;
 
