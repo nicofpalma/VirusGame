@@ -295,6 +295,9 @@ public class Juego implements IObservable {
                 }
             }
         }
+        if(ganador == null){
+            cambiarTurnoJugador();
+        }
     }
 
     public int cantidadDeCartasEnMazo(){

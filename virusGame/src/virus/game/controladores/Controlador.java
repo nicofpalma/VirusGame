@@ -10,8 +10,8 @@ import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
 public class Controlador implements IObservador {
-    private Juego modelo;
-    private IVista vista;
+    private final Juego modelo;
+    private final IVista vista;
     private Jugador jugador;
     private Jugador rival;
     private AccionModelo accionModelo;
@@ -135,9 +135,9 @@ public class Controlador implements IObservador {
     // También controla si hay un ganador
     public void finDeTurno(){
         modelo.controlarGanador();
-        if (modelo.getGanador() == null) {
-            modelo.cambiarTurnoJugador();
-        }
+        //if (modelo.getGanador() == null) {
+        //    modelo.cambiarTurnoJugador();
+        //}
     }
 
     public Jugador getJugadorGanador(){
