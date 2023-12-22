@@ -55,30 +55,30 @@ public class Mazo {
     private void insertarCartasDeVirus(){
         // 4 cartas de cada virus
         for (int i = 0; i < 4; i++) {
-            cartas.add(new Virus(Color.ROJO, "Virus del corazón", "virus/game/modelos/cartas/img/virusCorazon.png"));
-            cartas.add(new Virus(Color.VERDE, "Virus del estómago", "virus/game/modelos/cartas/img/virusEstomago.png"));
-            cartas.add(new Virus(Color.AZUL, "Virus del cerebro", "virus/game/modelos/cartas/img/virusCerebro.png"));
-            cartas.add(new Virus(Color.AMARILLO, "Virus del hueso", "virus/game/modelos/cartas/img/virusHueso.png"));
+            cartas.add(new Virus(Color.ROJO, "Virus del corazón", "virusCorazon.png"));
+            cartas.add(new Virus(Color.VERDE, "Virus del estómago", "virusEstomago.png"));
+            cartas.add(new Virus(Color.AZUL, "Virus del cerebro", "virusCerebro.png"));
+            cartas.add(new Virus(Color.AMARILLO, "Virus del hueso", "virusHueso.png"));
         }
     }
 
     private void insertarCartasDeMedicinas(){
         // 4 cartas de cada medicina
         for (int i = 0; i < 4; i++) {
-            cartas.add(new Medicina(Color.ROJO, "Medicina del corazón", "virus/game/modelos/cartas/img/medicinaCorazon.png"));
-            cartas.add(new Medicina(Color.VERDE, "Medicina del estómago", "virus/game/modelos/cartas/img/medicinaEstomago.png"));
-            cartas.add(new Medicina(Color.AZUL, "Medicina del cerebro", "virus/game/modelos/cartas/img/medicinaCerebro.png"));
-            cartas.add(new Medicina(Color.AMARILLO, "Medicina del hueso", "virus/game/modelos/cartas/img/medicinaHueso.png"));
+            cartas.add(new Medicina(Color.ROJO, "Medicina del corazón", "medicinaCorazon.png"));
+            cartas.add(new Medicina(Color.VERDE, "Medicina del estómago", "medicinaEstomago.png"));
+            cartas.add(new Medicina(Color.AZUL, "Medicina del cerebro", "medicinaCerebro.png"));
+            cartas.add(new Medicina(Color.AMARILLO, "Medicina del hueso", "medicinaHueso.png"));
         }
     }
 
     private void insertarCartasDeOrganos(){
         // 5 cartas de cada organo
         for (int i = 0; i < 5; i++) {
-            cartas.add(new Organo(Color.AZUL, "Cerebro", "virus/game/modelos/cartas/img/cerebro.png"));
-            cartas.add(new Organo(Color.VERDE, "Estómago", "virus/game/modelos/cartas/img/estomago.png"));
-            cartas.add(new Organo(Color.AMARILLO, "Hueso", "virus/game/modelos/cartas/img/hueso.png"));
-            cartas.add(new Organo(Color.ROJO, "Corazón", "virus/game/modelos/cartas/img/corazon.png"));
+            cartas.add(new Organo(Color.AZUL, "Cerebro", "cerebro.png"));
+            cartas.add(new Organo(Color.VERDE, "Estómago", "estomago.png"));
+            cartas.add(new Organo(Color.AMARILLO, "Hueso", "hueso.png"));
+            cartas.add(new Organo(Color.ROJO, "Corazón", "corazon.png"));
         }
     }
 

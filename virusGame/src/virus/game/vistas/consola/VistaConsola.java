@@ -277,7 +277,7 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void mostrarCartasManoJugador() {
         mostrarTextoEnNuevaLinea("   TU MANO:");
-        mostrarTextoEnNuevaLinea("   " + controlador.getJugador().verCartasMano());
+        mostrarTextoEnNuevaLinea("   " + controlador.getJugador().verCartasManoString());
     }
 
     @Override

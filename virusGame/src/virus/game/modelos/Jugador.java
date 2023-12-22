@@ -36,7 +36,7 @@ public class Jugador {
 
 
     /* Retorna las cartas de la mano en un string concatenado */
-    public String verCartasMano(){
+    public String verCartasManoString(){
         String cartas = "";
         for (int i = 0; i < mano.size(); i++) {
             if(i == mano.size() - 1){

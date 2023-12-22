@@ -2,6 +2,7 @@ package virus.game.modelos;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public abstract class Carta {
     // Color de la carta
@@ -13,15 +14,17 @@ public abstract class Carta {
     private final ImageIcon imagen;
 
     // Constructor de la carta
-    public Carta(Color color, String nombre, String rutaImagen){
+    public Carta(Color color, String nombre, String nombreImagen){
         this.color = color;
         this.nombre = nombre;
-        this.imagen = cargarImagen(rutaImagen);
+        this.imagen = cargarImagen(nombreImagen);
     }
 
     // Se encarga de buscar la imágen para cargarla, cuando se le pasa la ruta en el constructor.
-    public ImageIcon cargarImagen(String rutaImagen){
-        Image imagen = new ImageIcon(rutaImagen).getImage();
+    public ImageIcon cargarImagen(String nombreImagen){
+        int ancho = 100;
+        int alto = 140;
+        Image imagen = new ImageIcon("./src/virus/game/modelos/cartas/img/" + nombreImagen).getImage().getScaledInstance(ancho, alto, Image.SCALE_SMOOTH);
         return new ImageIcon(imagen);
     }
 

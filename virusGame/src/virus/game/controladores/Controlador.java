@@ -1,13 +1,13 @@
 package virus.game.controladores;
 
-import virus.game.modelos.AccionModelo;
-import virus.game.modelos.Cuerpo;
-import virus.game.modelos.Juego;
-import virus.game.modelos.Jugador;
+import virus.game.modelos.*;
 import virus.game.observer.IObservador;
 import virus.game.utils.SerializadorDeGanadores;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Controlador implements IObservador {
     private final Juego modelo;
@@ -51,6 +51,10 @@ public class Controlador implements IObservador {
         this.jugador = new Jugador(nombre);
         modelo.agregarJugador(jugador);
         modelo.iniciarJuego();
+    }
+
+    public ArrayList<Carta> getManoJugador(){
+        return jugador.getMano();
     }
 
     /* Devuelve el jugador del controlador */
