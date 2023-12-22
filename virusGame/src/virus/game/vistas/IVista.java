@@ -9,6 +9,8 @@ public interface IVista {
 
     void vistaInicial();
 
+    void ingresarNuevoJugador();
+
     void setAccionVista(AccionVista accion);
 
     void mostrarCartasManoRival();
