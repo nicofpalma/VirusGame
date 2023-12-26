@@ -15,8 +15,8 @@ public final class Organo extends Carta{
     private boolean extirpado;
 
     // Constructor que setea solo el color, el resto lo deja nulo.
-    public Organo(Color color, String nombre, String rutaImagen){
-        super(color, nombre, rutaImagen);
+    public Organo(Color color, String nombre, String nombreImagen){
+        super(color, nombre, nombreImagen);
         this.infecciones = new ArrayList<Virus>(2);
         this.medicinas = new ArrayList<Medicina>(2);
         this.inmune = false;
@@ -105,6 +105,14 @@ public final class Organo extends Carta{
 
     public boolean estaExtirpado() {
         return extirpado;
+    }
+
+    public boolean estaInfectado(){
+        return !infecciones.isEmpty();
+    }
+
+    public boolean tieneMedicina(){
+        return !medicinas.isEmpty();
     }
 
     public boolean esInmune(){

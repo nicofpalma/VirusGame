@@ -1,6 +1,7 @@
 package virus.game.controladores;
 
 import virus.game.modelos.*;
+import virus.game.modelos.cartas.Organo;
 import virus.game.observer.IObservador;
 import virus.game.utils.SerializadorDeGanadores;
 import virus.game.vistas.AccionVista;
@@ -75,6 +76,17 @@ public class Controlador implements IObservador {
         return getJugador().getCuerpoJugador();
     }
 
+    public ArrayList<Carta> getCartasDelMazoDeDescartes(){
+        return (ArrayList<Carta>) modelo.getMazoDeDescarte().getCartas();
+    }
+
+    public ArrayList<Organo> getOrganosDelCuerpoDelJugador(){
+        return getCuerpoJugador().getOrganos();
+    }
+
+    public ArrayList<Organo> getOrganosDelCuerpoDelRival() {
+        return getCuerpoRival().getOrganos();
+    }
     /* Obtiene el cuerpo del jugador en un String concatenado */
     public String getCuerpoJugadorToString(){
         return getCuerpoJugador().toString();
@@ -139,9 +151,6 @@ public class Controlador implements IObservador {
     // También controla si hay un ganador
     public void finDeTurno(){
         modelo.controlarGanador();
-        //if (modelo.getGanador() == null) {
-        //    modelo.cambiarTurnoJugador();
-        //}
     }
 
     public Jugador getJugadorGanador(){
