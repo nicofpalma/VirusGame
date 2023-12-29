@@ -12,7 +12,7 @@ public class EjecucionJuegoVirus {
     public static void main(String[] args)
     {
         SwingUtilities.invokeLater(() -> {
-            // Genero las vistas de consola
+            // Genero las vistas
             IVista vista1 = new VistaGrafica();
             IVista vista2 = new VistaGrafica();
 

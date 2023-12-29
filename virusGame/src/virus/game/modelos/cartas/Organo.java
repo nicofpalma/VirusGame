@@ -29,11 +29,12 @@ public final class Organo extends Carta{
         if(!infecciones.isEmpty()){
             nombreOrgano += " -INFECTADO";
         }
-        if(!medicinas.isEmpty()){
-            nombreOrgano += " -VACUNADO";
-        }
         if(esInmune()){
             nombreOrgano += " -INMUNE";
+        } else {
+            if(!medicinas.isEmpty()){
+                nombreOrgano += " -VACUNADO";
+            }
         }
         nombreOrgano += "]";
         return nombreOrgano;

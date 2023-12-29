@@ -3,18 +3,18 @@ package virus.game.vistas.grafica;
 import virus.game.controladores.Controlador;
 import virus.game.modelos.Carta;
 import virus.game.modelos.cartas.Organo;
+import virus.game.utils.Const;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class VistaGrafica extends JFrame implements IVista {
@@ -31,19 +31,32 @@ public class VistaGrafica extends JFrame implements IVista {
     private JButton botonConfirmar;
     private JPanel panelTextoInformativo;
     private JButton botonDescartar;
+    private JButton botonCancelarDescarte;
     private JButton botonJugar;
     private JPanel panelTextoTurno;
     private JLayeredPane capas;
     private JLabel cartaSeleccionada = null;
-    private JCheckBox[] checkBoxCartas;
-    private JPanel panelDeCheckbox;
+    private ArrayList<JLabel> cartasSeleccionadasParaDescartar;
+    private JLabel textoNombreJugador;
+    private JLabel textoNombreRival;
 
+
+    /**
+     * Constructor de la vista gráfica
+     * */
     public VistaGrafica(){
         setTitle("Virus - Vista Grafica");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
         setLocationRelativeTo(null);
         setVisible(true);
+        setResizable(false);
+
+        // Colores del tooltip, texto que se muestra al poner el mouse arriba de una carta por ejemplo
+        UIManager.put("ToolTip.background", Color.BLACK);
+        UIManager.put("ToolTip.foreground", Color.WHITE);
+        Border border = BorderFactory.createLineBorder(Const.COLOR_VIOLETA); // Borde violeta del tooltip
+        UIManager.put("ToolTip.border", border);
 
         campoNombre = new JTextField();
         campoNombre.setColumns(15);
@@ -56,20 +69,17 @@ public class VistaGrafica extends JFrame implements IVista {
 
         add(panelIngresoNombre, BorderLayout.SOUTH);
 
-        botonConfirmar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                switch (accionVista){
-                    case NUEVO_JUGADOR: {
-                        ingresarNuevoJugador();
-                        break;
-                    }
-                    case ESPERAR_TURNO:{
-                        break;
-                    }
-                    default:
-                        break;
+        botonConfirmar.addActionListener(e -> {
+            switch (accionVista){
+                case NUEVO_JUGADOR: {
+                    ingresarNuevoJugador();
+                    break;
                 }
+                case ESPERAR_TURNO:{
+                    break;
+                }
+                default:
+                    break;
             }
         });
 
@@ -85,7 +95,7 @@ public class VistaGrafica extends JFrame implements IVista {
         if(panelManoJugador == null){
             // Crea el panel de las cartas del jugador (la mano), sólo cuando no está creado todavía
             panelManoJugador = new JPanel();
-            panelManoJugador.setSize(350, 250);
+            panelManoJugador.setSize(Const.SIZE_MANO_JUGADOR_X, Const.SIZE_MANO_JUGADOR_Y);
             panelManoJugador.setVisible(true);
             panelManoJugador.setOpaque(false);
 
@@ -95,7 +105,7 @@ public class VistaGrafica extends JFrame implements IVista {
             panelManoJugador.removeAll();
         }
 
-        panelManoJugador.setLocation(210, 420);
+        panelManoJugador.setLocation(Const.LOC_MANO_JUGADOR_X, Const.LOC_MANO_JUGADOR_Y);
         // Recorro la mano del jugador, y por cada carta, obtengo su imagen y la agrego al panel de la mano para mostrarlas
         ArrayList<Carta> mano = controlador.getManoJugador();
 
@@ -113,53 +123,82 @@ public class VistaGrafica extends JFrame implements IVista {
             // Identificador de carta para poder jugarlas, 1, 2, 3
             labelCarta.setName(String.valueOf(i+1));
 
-            // Hover para mostrar el nombre de la carta
-            //labelCarta.setToolTipText(carta.getNombre() + " (" + carta.getClass().getSimpleName() + ")");  // muestra el nombre de la carta al posicionar el mouse encima
+            // Hover con el nombre de la carta
+            labelCarta.setToolTipText(carta.toString());
 
             // Eventos del mouse para las cartas de la mano
             labelCarta.addMouseListener(new MouseAdapter() {
+                // Guarda la ubicacion en Y cuando se pasa el mouse encima de la carta, para poder volver a su posicion original cuando se saca el mouse
                 private int ubicacionY;
                 @Override
                 public void mouseEntered(MouseEvent e){
                     labelCarta.setLocation(labelCarta.getLocation().x, labelCarta.getLocation().y - 50);
                     ubicacionY = labelCarta.getLocation().y;
-                    setCursor(Cursor.HAND_CURSOR);
+                    labelCarta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));   // Cambia al cursor de la mano para indicar que es clickeable
                 }
 
                 @Override
                 public void mouseExited(MouseEvent e){
                     labelCarta.setLocation(labelCarta.getLocation().x, ubicacionY + 50);
-                    setCursor(Cursor.DEFAULT_CURSOR);
+                    labelCarta.setCursor(Cursor.getDefaultCursor());    // Cambia al cursor por default al salir
                 }
                 @Override
                 public void mouseClicked(MouseEvent e) {
+                    int espacio = Const.ESPACIO_BORDE_SELECCION_CARTA;
                     switch (accionVista){
                         case ESPERAR_TURNO:{
                             mostrarTextoInformativo("No es tu turno, espera...");
-
                             break;
                         }
                         case TURNO_JUGADOR:{
+                            // 3 casos.
+                            // 1 -> Deselecciona la carta actual si ya estaba seleccionada
+                            // 2 -> Deselecciona la carta anterior si se selecciona una nueva carta
+                            // 3 -> Selecciona la carta actual.
+
                             if(cartaSeleccionada != null && cartaSeleccionada.equals(labelCarta)){
+                                // Deselecciona la carta actual
                                 cartaSeleccionada = null;
                                 botonJugar.setVisible(false);
                                 labelCarta.setBorder(null);
-                                //mostrarTextoInformativo("Juega una carta haciendo click en ella, o descarta si no tienes opciones");
+                                botonDescartar.setVisible(true);
+
+                                mostrarTextoInformativo("Juega una carta haciendo click en ella, o descarta si no tienes opciones");
                             } else {
                                 if(cartaSeleccionada != null){
                                     // Deselecciona la carta anterior
-                                    //cartaSeleccionada.setLocation(cartaSeleccionada.getLocation().x, ubicacionY);
                                     cartaSeleccionada.setBorder(null);
                                 }
 
                                 // Selecciona la carta actual
                                 cartaSeleccionada = labelCarta;
-                                //labelCarta.setLocation(labelCarta.getLocation().x, ubicacionY - 20);
-                                //mostrarTextoInformativo("Carta seleccionada : " + cartaSeleccionada.getToolTipText());
-                                labelCarta.setBorder(BorderFactory.createLineBorder(Color.white, 2));
+
+                                // Creo un borde blanco para indicar que la carta está seleccionada
+                                labelCarta.setBorder(BorderFactory.createCompoundBorder(
+                                        BorderFactory.createLineBorder(Color.white, 3),
+                                        new EmptyBorder(espacio, espacio, espacio, espacio)));
+
                                 botonJugar.setVisible(true);
+                                botonDescartar.setVisible(false);
+
+                                mostrarTextoInformativo("Carta seleccionada: " + carta);
                             }
                             break;
+                        }
+                        case DESCARTAR_CARTAS:{
+                            if(labelCarta.getBorder() != null){
+                                // Elimina el borde, deselecciona la carta
+                                labelCarta.setBorder(null);
+                                cartasSeleccionadasParaDescartar.remove(labelCarta);
+                            } else {
+                                if(cartasSeleccionadasParaDescartar == null) cartasSeleccionadasParaDescartar = new ArrayList<>(3);
+                                // Selecciona la carta, creo un borde externo para indicar que la carta está seleccionada
+                                labelCarta.setBorder(BorderFactory.createCompoundBorder(
+                                                BorderFactory.createLineBorder(Color.white, 3),
+                                                new EmptyBorder(espacio, espacio, espacio, espacio)));
+
+                                cartasSeleccionadasParaDescartar.add(labelCarta);
+                            }
                         }
                         default:{
                             break;
@@ -167,6 +206,7 @@ public class VistaGrafica extends JFrame implements IVista {
                     }
                 }
             });
+
             panelDeLaMano.add(labelCarta);
         }
 
@@ -183,7 +223,7 @@ public class VistaGrafica extends JFrame implements IVista {
     private void mostrarTextoInformativo(String texto){
         if(panelTextoInformativo == null){
             panelTextoInformativo = new JPanel();
-            panelTextoInformativo.setSize(500, 100);
+            panelTextoInformativo.setSize(Const.SIZE_TEXTO_INFORMATIVO_X, Const.SIZE_TEXTO_INFORMATIVO_Y);
             panelTextoInformativo.setVisible(true);
             panelTextoInformativo.setOpaque(false);
             capas.add(panelTextoInformativo, JLayeredPane.POPUP_LAYER);
@@ -195,9 +235,9 @@ public class VistaGrafica extends JFrame implements IVista {
         labelTexto.setForeground(Color.white);
 
         panelTextoInformativo.add(labelTexto, BorderLayout.CENTER);
-        panelTextoInformativo.setLocation(150, 15);
+        panelTextoInformativo.setLocation(Const.LOC_TEXTO_INFORMATIVO_X, Const.LOC_TEXTO_INFORMATIVO_Y);
         panelTextoInformativo.revalidate();
-        panelTextoInformativo.repaint(300);
+        panelTextoInformativo.repaint();
     }
 
     private void mostrarBienvenida(){
@@ -208,26 +248,26 @@ public class VistaGrafica extends JFrame implements IVista {
 
         add(textoBienvenida, BorderLayout.CENTER);
 
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
         textoBienvenida.append("  OBJETIVO Y REGLAS DEL JUEGO\n");
         textoBienvenida.append("  --> PARA GANAR: Tener en tu cuerpo (tu mesa) las 4 cartas de órganos diferentes, sin ninguna infección.\n");
         textoBienvenida.append("  --> ORGANOS: Cerebro, Corazón, Estómago y Hueso\n");
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
         textoBienvenida.append("  --> VIRUS: Los hay para cada órgano. Sirven para infectar los órganos del rival e impedir que éste gane.\n");
         textoBienvenida.append("  --> Si se aplican 2 virus sobre un órgano, éste se extirpará del cuerpo (se eliminará).\n");
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
 
         textoBienvenida.append("  --> MEDICINAS: Las hay para cada órgano. Sirven para vacunar tus órganos, mantenerlos a salvo.\n");
         textoBienvenida.append("  --> Si se aplican 2 medicinas sobre un órgano, éste se volverá inmune a cualquier virus.\n");
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
 
         textoBienvenida.append(" --> Si se aplica un virus sobre un órgano que está vacunado, éste eliminará esa vacuna.\n");
         textoBienvenida.append(" --> Si se aplica una medicina sobre un órgano que está infectado, éste eliminará ese virus.\n");
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
         textoBienvenida.append(" --> DESCARTAR CARTAS: Durante tu turno, presiona '0' para elegir qué cartas quieres descartar.\n");
         textoBienvenida.append(" --> En cada turno tendremos 3 cartas en la mano. Podés jugar una, o descartar hasta las 3 cartas.\n");
         textoBienvenida.append(" --> Habrá ocasiones en las que no podrás jugar ninguna carta, te verás obligado a descartar :)\n");
-        textoBienvenida.append("---------------------------------------------------------------------\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
 
         textoBienvenida.append("Para iniciar, ingrese su nombre en el input que está debajo: \n");
     }
@@ -235,7 +275,7 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void ingresarNuevoJugador() {
-        String nombre = campoNombre.getText().trim();
+        String nombre = campoNombre.getText().trim().toUpperCase();
         controlador.nuevoJugador(nombre);
         campoNombre.setText("");
     }
@@ -257,9 +297,10 @@ public class VistaGrafica extends JFrame implements IVista {
         if(!organosCuerpoRival.isEmpty()){
             if(panelCuerpoRival == null){
                 panelCuerpoRival = new JPanel();
-                panelCuerpoRival.setSize(520, 180);
+                panelCuerpoRival.setSize(Const.SIZE_PANEL_CUERPO_X, Const.SIZE_PANEL_CUERPO_Y);
                 panelCuerpoRival.setVisible(true);
                 panelCuerpoRival.setOpaque(false);
+                panelCuerpoRival.setLocation(Const.LOC_PANEL_CUERPO_X, Const.LOC_PANEL_CUERPO_RIVAL_Y);
                 capas.add(panelCuerpoRival, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelCuerpoRival.removeAll();
@@ -274,13 +315,15 @@ public class VistaGrafica extends JFrame implements IVista {
                 JLabel labelOrgano = new JLabel(imagenOrgano);
                 labelOrgano.setLayout(new BoxLayout(labelOrgano, BoxLayout.X_AXIS));
 
-                //labelOrgano.setToolTipText(organo.getNombre() + " (" + organo.getClass().getSimpleName() + " )");
                 panelDelCuerpo.add(labelOrgano);
+
+                // Hover con nombre y estado de la carta
+                labelOrgano.setToolTipText(organo.toString());
 
                 if(organo.estaInfectado()){
                     Image imagenInfeccion = organo.getInfecciones().get(0).getImagen()
                             .getImage()
-                            .getScaledInstance(60, 90, Image.SCALE_SMOOTH);
+                            .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
 
                     JLabel labelInfeccion = new JLabel(new ImageIcon(imagenInfeccion));
                     labelInfeccion.setVisible(true);
@@ -289,21 +332,42 @@ public class VistaGrafica extends JFrame implements IVista {
 
                     labelOrgano.add(labelInfeccion);
                 } else {
-                    if(organo.tieneMedicina()){
+                    if(organo.esInmune()){
+                        // Si es inmune, muestro ambas medicinas
+                        JPanel panelMedicinas = new JPanel();
+                        panelMedicinas.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                        panelMedicinas.setOpaque(false);
+
                         Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                 .getImage()
-                                .getScaledInstance(60, 90, Image.SCALE_SMOOTH);
+                                .getScaledInstance(Const.SIZE_IMGS_INMUNE_X, Const.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
 
-                        JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
-                        labelMedicina.setVisible(true);
-                        labelMedicina.setOpaque(false);
-                        labelMedicina.setAlignmentY(2.0f);
+                        JLabel labelMedicina1 = new JLabel(new ImageIcon(imagenMedicina));
+                        JLabel labelMedicina2 = new JLabel(new ImageIcon(imagenMedicina));
+                        labelMedicina1.setOpaque(false);
+                        labelMedicina2.setOpaque(false);
 
-                        labelOrgano.add(labelMedicina);
+                        panelMedicinas.add(labelMedicina1);
+                        panelMedicinas.add(labelMedicina2);
+
+                        labelOrgano.setLayout(new BorderLayout());
+                        labelOrgano.add(panelMedicinas, BorderLayout.SOUTH);
+                    } else {
+                        if(organo.tieneMedicina()){
+                            Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
+                                    .getImage()
+                                    .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                            JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
+                            labelMedicina.setVisible(true);
+                            labelMedicina.setOpaque(false);
+                            labelMedicina.setAlignmentY(2.0f);
+
+                            labelOrgano.add(labelMedicina);
+                        }
                     }
+
                 }
             }
-            panelCuerpoRival.setLocation(160, 35);
             panelCuerpoRival.add(panelDelCuerpo);
         }
     }
@@ -316,9 +380,10 @@ public class VistaGrafica extends JFrame implements IVista {
             if(panelCuerpoJugador == null){
                 // Creo el panel del cuerpo del jugador si no estaba creado anteriormente
                 panelCuerpoJugador = new JPanel();
-                panelCuerpoJugador.setSize(520, 180);
+                panelCuerpoJugador.setSize(Const.SIZE_PANEL_CUERPO_X, Const.SIZE_PANEL_CUERPO_Y);
                 panelCuerpoJugador.setVisible(true);
                 panelCuerpoJugador.setOpaque(false);
+                panelCuerpoJugador.setLocation(Const.LOC_PANEL_CUERPO_X, Const.LOC_PANEL_CUERPO_JUGADOR_Y);
                 capas.add(panelCuerpoJugador, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelCuerpoJugador.removeAll();
@@ -337,14 +402,13 @@ public class VistaGrafica extends JFrame implements IVista {
                 // Le doy un boxlayout al label del organo, para poder mostrar su infeccion o medicina
                 labelOrgano.setLayout(new BoxLayout(labelOrgano, BoxLayout.X_AXIS));
 
-                // Hover para mostrar el nombre del organo
-                //labelOrgano.setToolTipText(organo.getNombre() + " (" + organo.getClass().getSimpleName() + " )");
+                labelOrgano.setToolTipText(organo.toString());
                 panelDelCuerpo.add(labelOrgano);
 
                 if(organo.estaInfectado()) {
                     Image imagenInfeccion = organo.getInfecciones().get(0).getImagen().
                             getImage().
-                            getScaledInstance(60, 90, Image.SCALE_SMOOTH);
+                            getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
 
                     JLabel labelInfeccion = new JLabel(new ImageIcon(imagenInfeccion));
                     labelInfeccion.setVisible(true);
@@ -353,29 +417,47 @@ public class VistaGrafica extends JFrame implements IVista {
 
                     labelOrgano.add(labelInfeccion);
                 } else {
-                    if(organo.tieneMedicina()){
-                        // Agregeo la carta de medicina sobre la carta del organo
+                    if(organo.esInmune()){
+                        // Si es inmune, muestro ambas medicinas
+                        JPanel panelMedicinas = new JPanel();
+                        panelMedicinas.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                        panelMedicinas.setOpaque(false);
+
                         Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                 .getImage()
-                                .getScaledInstance(60, 90, Image.SCALE_SMOOTH);
-                        JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
-                        labelMedicina.setVisible(true);
-                        labelMedicina.setOpaque(false);
-                        labelMedicina.setAlignmentY(2.0f);
+                                .getScaledInstance(Const.SIZE_IMGS_INMUNE_X, Const.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
 
-                        labelOrgano.add(labelMedicina);
+                        JLabel labelMedicina1 = new JLabel(new ImageIcon(imagenMedicina));
+                        JLabel labelMedicina2 = new JLabel(new ImageIcon(imagenMedicina));
+                        labelMedicina1.setOpaque(false);
+                        labelMedicina2.setOpaque(false);
+
+                        panelMedicinas.add(labelMedicina1);
+                        panelMedicinas.add(labelMedicina2);
+
+                        labelOrgano.setLayout(new BorderLayout());
+                        labelOrgano.add(panelMedicinas, BorderLayout.SOUTH);
+                    } else {
+                        if(organo.tieneMedicina()){
+                            // Agregeo la carta de medicina sobre la carta del organo
+                            Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
+                                    .getImage()
+                                    .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                            JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
+                            labelMedicina.setVisible(true);
+                            labelMedicina.setOpaque(false);
+                            labelMedicina.setAlignmentY(2.0f);
+
+                            labelOrgano.add(labelMedicina);
+                        }
                     }
+
                 }
             }
-
-            panelCuerpoJugador.setLocation(160, 240);
             panelCuerpoJugador.add(panelDelCuerpo);
         }
 
     }
-
-
-
 
     @Override
     public void mostrarCantidadDeCartasEnMazo() {
@@ -420,11 +502,10 @@ public class VistaGrafica extends JFrame implements IVista {
     public void iniciarVistaYControlarEventos(){
         // Agrego capas para poder manejar varios elementos simultaneos
         capas = new JLayeredPane();
-        //capas.setPreferredSize(new Dimension(800, 600));
-        capas.setSize(800, 600);
+        capas.setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
 
         // Agrego una imágen de fondo
-        ImageIcon background = new ImageIcon("./src/virus/game/modelos/cartas/img/fondo.jpg");
+        ImageIcon background = new ImageIcon("./src/virus/game/modelos/cartas/img/fondo4.jpg");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setBounds(0, 0, background.getIconWidth(), background.getIconHeight());
 
@@ -435,90 +516,117 @@ public class VistaGrafica extends JFrame implements IVista {
         // Creacion de los botones para jugar
         botonDescartar = new JButton();
         botonDescartar.setText("Descartar");
-        botonDescartar.setSize(100, 30);
+        botonDescartar.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
         botonDescartar.setVisible(false);
-        botonDescartar.setLocation(630, 435);
+        botonDescartar.setLocation(Const.LOC_BTN_DESCARTAR_X, Const.LOC_BTN_Y);
+        botonDescartar.setBackground(Color.WHITE);
+        botonDescartar.setForeground(Color.BLACK);
 
-        botonDescartar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                switch (accionVista){
-                    case TURNO_JUGADOR:{
-                        mostrarTextoInformativo("Seleccione las cartas a descartar");
-                        botonDescartar.setText("Confirmar");
-                        panelDeCheckbox.setVisible(true);
-                        setAccionVista(AccionVista.DESCARTAR_CARTAS);
-                        break;
+        botonCancelarDescarte = new JButton();
+        botonCancelarDescarte.setText("Cancelar");
+        botonCancelarDescarte.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
+        botonCancelarDescarte.setVisible(false);
+        botonCancelarDescarte.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        botonCancelarDescarte.setBackground(Color.WHITE);
+        botonCancelarDescarte.setForeground(Color.BLACK);
+
+        // Muestra el nombre del jugador y del rival
+        textoNombreJugador = new JLabel(controlador.getJugador().getNombre());
+        textoNombreJugador.setForeground(Color.WHITE);
+        textoNombreJugador.setSize(100, 100);
+        textoNombreJugador.setOpaque(false);
+        textoNombreJugador.setLocation(690, 282);
+        textoNombreJugador.setVisible(true);
+        textoNombreJugador.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
+        textoNombreJugador.setToolTipText("Tú");
+
+        textoNombreRival = new JLabel(controlador.getRival().getNombre());
+        textoNombreRival.setForeground(Color.WHITE);
+        textoNombreRival.setSize(100, 100);
+        textoNombreRival.setOpaque(false);
+        textoNombreRival.setLocation(690, 75);
+        textoNombreRival.setVisible(true);
+        textoNombreRival.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
+        textoNombreRival.setToolTipText("Rival");
+
+
+        botonDescartar.addActionListener(e -> {
+            switch (accionVista){
+                case TURNO_JUGADOR:{
+                    // Cuando el jugador hace click en el botón Descartar
+                    mostrarTextoInformativo("Seleccione las cartas a descartar");
+                    botonDescartar.setText("Confirmar");
+                    setAccionVista(AccionVista.DESCARTAR_CARTAS);
+                    botonCancelarDescarte.setVisible(true);
+
+                    // Si había alguna carta seleccionada, la deselecciona
+                    if(cartaSeleccionada != null) {
+                        cartaSeleccionada.setBorder(null);
+                        cartaSeleccionada = null;
+                        botonJugar.setVisible(false);
                     }
-                    case DESCARTAR_CARTAS:{
-                        // Obtengo los indices de las cartas a descartar según los checkboxes seleccionados
-                        ArrayList<Integer> listaDeCartasADescartar = new ArrayList<>();
-                        for (int i = 0; i < checkBoxCartas.length; i++) {
-                            if(checkBoxCartas[i].isSelected()){
-                                // Añado los índices de los checkboxes
-                                listaDeCartasADescartar.add(i+1);
-                            }
+                    break;
+                }
+                case DESCARTAR_CARTAS:{
+                    // Se acciona cuando se hace click en el botón "Confirmar"
+                    // Controla que si no hay ninguna carta seleccionada, no permito descartar
+                    boolean noHayCartasSeleccionadas = cartasSeleccionadasParaDescartar == null || cartasSeleccionadasParaDescartar.isEmpty();
+                    if(noHayCartasSeleccionadas){
+                        // Si no hay cartas seleccionadas, lo informo y no descarto
+                        mostrarTextoInformativo("Debe seleccionar al menos una carta para descartar");
+                    } else {
+                        int[] indicesDeCartasADescartar = new int[cartasSeleccionadasParaDescartar.size()];
+                        for (int i = 0; i < cartasSeleccionadasParaDescartar.size(); i++) {
+                            indicesDeCartasADescartar[i] = Integer.parseInt(cartasSeleccionadasParaDescartar.get(i).getName()); // El label de la carta contiene de nombre el numero de carta que le corresponde.
                         }
-                        // Transformo los índices a un array común para enviarselos al controlador
-                        int[] indicesDeCartasADescartar = new int[listaDeCartasADescartar.size()];
-                        for (int i = 0; i < listaDeCartasADescartar.size(); i++) {
-                            indicesDeCartasADescartar[i] = listaDeCartasADescartar.get(i);
-                        }
-
-                        // Descarto las cartas que pidió descartar el usuario.
-                        controlador.descartarCartas(indicesDeCartasADescartar);
-                        for (JCheckBox checkBoxCarta : checkBoxCartas) {
-                            checkBoxCarta.setSelected(false);
-                        }
+                        controlador.descartarCartas(indicesDeCartasADescartar); // Descarto las cartas seleccionadas
+                        cartasSeleccionadasParaDescartar = null;        // Elimino el array
                         mostrarTextoInformativo("");
-                        panelDeCheckbox.setVisible(false);
                         controlador.finDeTurno();
-
+                        botonCancelarDescarte.setVisible(false);
                         botonDescartar.setText("Descartar");
-                        break;
                     }
+                    break;
                 }
             }
         });
 
+        // Acciones del boton para cancelar el descarte
+        botonCancelarDescarte.addActionListener(e -> {
+            if(cartasSeleccionadasParaDescartar != null) {
+                for (JLabel labelCarta : cartasSeleccionadasParaDescartar) {
+                    labelCarta.setBorder(null);
+                }
+                cartasSeleccionadasParaDescartar = null;
+            }
+            botonDescartar.setText("Descartar");
+            setAccionVista(AccionVista.TURNO_JUGADOR);
+            botonCancelarDescarte.setVisible(false);
+            mostrarTextoInformativo(Const.TXT_JUEGA_UNA_CARTA);
+        });
+
         botonJugar = new JButton();
         botonJugar.setText("Jugar");
-        botonJugar.setSize(100, 30);
+        botonJugar.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
         botonJugar.setVisible(false);
-        botonJugar.setLocation(630, 475);
+        botonJugar.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        botonJugar.setBackground(Color.WHITE);
+        botonJugar.setForeground(Color.BLACK);
 
-        botonJugar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                jugadorRealizaUnaAccion();
-            }
+        botonJugar.addActionListener(e -> {
+            // Esto acciona todo lo relativo a las cartas, menos descartar
+            jugadorRealizaUnaAccion();
         });
 
         capas.add(botonJugar, JLayeredPane.POPUP_LAYER);
         capas.add(botonDescartar, JLayeredPane.POPUP_LAYER);
+        capas.add(botonCancelarDescarte, JLayeredPane.POPUP_LAYER);
+        capas.add(textoNombreJugador, JLayeredPane.DRAG_LAYER);
+        capas.add(textoNombreRival, JLayeredPane.DRAG_LAYER);
     }
 
     // Muestra el boton para descartar cartas solo cuando es su turno
-    // Y los checkboxes asociados para descartar
     public void mostrarBotonDescartar() {
-        if(checkBoxCartas == null){
-            checkBoxCartas = new JCheckBox[3];
-            for (int i = 0; i < checkBoxCartas.length; i++) {
-                checkBoxCartas[i] = new JCheckBox();
-                checkBoxCartas[i].setVisible(true);
-            }
-            panelDeCheckbox = new JPanel();
-            panelDeCheckbox.setOpaque(false);
-            panelDeCheckbox.setLayout(new FlowLayout(FlowLayout.CENTER, 85, 30));
-            panelDeCheckbox.add(checkBoxCartas[0], BorderLayout.CENTER);
-            panelDeCheckbox.add(checkBoxCartas[1], BorderLayout.CENTER);
-            panelDeCheckbox.add(checkBoxCartas[2], BorderLayout.CENTER);
-            panelDeCheckbox.setSize(500, 200);
-            panelDeCheckbox.setLocation(138, 510);
-            panelDeCheckbox.setVisible(false);
-
-            capas.add(panelDeCheckbox, JLayeredPane.POPUP_LAYER);
-        }
         botonDescartar.setVisible(controlador.esSuTurno());
     }
 
@@ -532,9 +640,10 @@ public class VistaGrafica extends JFrame implements IVista {
         // Si el panel del mazo todavía no se creó, se crea aquí por primera vez
         if(panelMazo == null){
             panelMazo = new JPanel();
-            panelMazo.setSize(140, 200);
+            panelMazo.setSize(Const.SIZE_MAZO_X, Const.SIZE_MAZO_Y);
             panelMazo.setOpaque(false);
             panelMazo.setVisible(true);
+            panelMazo.setLocation(Const.LOC_MAZO_X ,Const.LOC_MAZO_Y);
             capas.add(panelMazo, JLayeredPane.PALETTE_LAYER);
         } else {
             panelMazo.removeAll();
@@ -543,27 +652,29 @@ public class VistaGrafica extends JFrame implements IVista {
         // Creo un panel dentro del panel del mazo, para mostrar las cartas
         // Uso boxLayout para poder controlar el desplazamiento de cada una de las cartas
         int cantidadDeCartasEnMazo = controlador.getCantidadDeCartasEnMazo();
+
         JPanel panelCartasDelMazo = new JPanel();
         panelCartasDelMazo.setOpaque(false);
         panelCartasDelMazo.setLayout(new BoxLayout(panelCartasDelMazo, BoxLayout.Y_AXIS));
 
-        JLabel labelTexto = new JLabel();
-        labelTexto.setText(cantidadDeCartasEnMazo + " cartas");
-        labelTexto.setForeground(Color.white);
+        JLabel labelCantidadDeCartasEnMazo = new JLabel();
+        labelCantidadDeCartasEnMazo.setText(cantidadDeCartasEnMazo + " cartas");
+        labelCantidadDeCartasEnMazo.setForeground(Color.white);
 
-        labelTexto.setBorder(BorderFactory.createEmptyBorder(0, 15, 0,0));
-        Font fuente = labelTexto.getFont();
-        labelTexto.setFont(new Font(fuente.getName(), Font.BOLD, fuente.getSize() + 5));
+        labelCantidadDeCartasEnMazo.setBorder(BorderFactory.createEmptyBorder(0, 12, 0,0));
+        Font fuenteGlobal = labelCantidadDeCartasEnMazo.getFont();
+        labelCantidadDeCartasEnMazo.setFont(new Font(fuenteGlobal.getName(), Font.BOLD, fuenteGlobal.getSize() + 2));
 
-        panelCartasDelMazo.add(labelTexto);
+        panelCartasDelMazo.add(labelCantidadDeCartasEnMazo);
+        labelCantidadDeCartasEnMazo.setVisible(false);
 
         // Obtengo la imágen del dorso de las cartas
         Image imagenDorso = new ImageIcon("./src/virus/game/modelos/cartas/img/dorso.png")
                 .getImage()
-                .getScaledInstance(100, 140, Image.SCALE_SMOOTH);
+                .getScaledInstance(Const.SIZE_IMG_MAZO_X, Const.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
 
-        if(cantidadDeCartasEnMazo >= 4) cantidadDeCartasEnMazo = cantidadDeCartasEnMazo / 4;
-        for (int i = 0; i < cantidadDeCartasEnMazo; i++) {
+        if(cantidadDeCartasEnMazo == 1) cantidadDeCartasEnMazo = 2; // Para que se muestre cuando queda solo 1 carta
+        for (int i = (cantidadDeCartasEnMazo / 2) - 1; i >= 0; i--) {
             // Creo la imagen del dorso de las cartas
             // De modo que cada carta esté una abajo de otra
             JLabel labelDorso = new JLabel(new ImageIcon(imagenDorso));
@@ -571,19 +682,23 @@ public class VistaGrafica extends JFrame implements IVista {
 
             panelCartasDelMazo.add(labelDorso);
 
-            if(i < (cantidadDeCartasEnMazo) - 1){
-                panelCartasDelMazo.add(Box.createRigidArea(new Dimension(0,-138)));
-
+            if(i > 0){
+                panelCartasDelMazo.add(Box.createRigidArea(new Dimension(0,-109)));
             }
         }
 
-        //if(panelMazo != null){
-        //    panelMazo.removeAll();
-        //}
-
-        //panelCartasDelMazo.setToolTipText("Mazo (" + cantidadDeCartasEnMazo + ")");
-        panelMazo.setLocation(0 ,200);
         panelMazo.add(panelCartasDelMazo);
+        panelMazo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                labelCantidadDeCartasEnMazo.setVisible(true);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                labelCantidadDeCartasEnMazo.setVisible(false);
+            }
+        });
     }
 
     // Muestra el mazo de descartes
@@ -593,9 +708,10 @@ public class VistaGrafica extends JFrame implements IVista {
         if(!cartasDelMazoDeDescartes.isEmpty()) {
             if(panelMazoDeDescartes == null){
                 panelMazoDeDescartes = new JPanel();
-                panelMazoDeDescartes.setSize(140, 200);
+                panelMazoDeDescartes.setSize(Const.SIZE_MAZO_X, Const.SIZE_MAZO_DESCARTES_Y);
                 panelMazoDeDescartes.setVisible(true);
                 panelMazoDeDescartes.setOpaque(false);
+                panelMazoDeDescartes.setLocation(Const.LOC_MAZO_X, Const.LOC_MAZO_DESCARTES_Y);
                 capas.add(panelMazoDeDescartes, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelMazoDeDescartes.removeAll();
@@ -607,27 +723,28 @@ public class VistaGrafica extends JFrame implements IVista {
             panelCartasDelMazoDeDescartes.setLayout(new BoxLayout(panelCartasDelMazoDeDescartes, BoxLayout.Y_AXIS));
 
             int cantidadDeCartas = cartasDelMazoDeDescartes.size();
-            if(cantidadDeCartas >= 3) cantidadDeCartas = cantidadDeCartas / 3;
 
-            for (int i = 0; i < cantidadDeCartas; i++) {
-                    ImageIcon imagenCarta = cartasDelMazoDeDescartes.get(i).getImagen();
-                    JLabel labelCarta = new JLabel(imagenCarta);
+            // Toma las últimas 3 cartas, es decir, las que se acaban de descartar únicamente
+            int cantCartasAMostrar = Math.max(cantidadDeCartas - 3, 0);
 
-                    labelCarta.setBorder(BorderFactory.createEmptyBorder(0, i, 0, 0));
+            // Bucle para mostrar las últimas 3
+            for (int i = cantidadDeCartas - 1; i >= cantCartasAMostrar; i--) {
+                Image imagenCarta = cartasDelMazoDeDescartes.get(i).getImagen()
+                        .getImage()
+                        .getScaledInstance(Const.SIZE_IMG_MAZO_X, Const.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
+                JLabel labelCarta = new JLabel(new ImageIcon(imagenCarta));
 
-                    panelCartasDelMazoDeDescartes.add(labelCarta);
-                    if(i < (cantidadDeCartas) - 1){
-                        panelCartasDelMazoDeDescartes.add(Box.createRigidArea(new Dimension(0, -138)));
-                    }
+                labelCarta.setToolTipText(cartasDelMazoDeDescartes.get(i).toString() + " (Descartada)");
+
+                panelCartasDelMazoDeDescartes.add(labelCarta);
+                if(i > cantCartasAMostrar){
+                    // Mueve las cartas de más abajo, de forma vertical para abajo.
+                    panelCartasDelMazoDeDescartes.add(Box.createRigidArea(new Dimension(0, -60)));
+                }
             }
-
-            //if(panelMazoDeDescartes != null){
-            //    panelMazoDeDescartes.removeAll();
-            //}
-
-            //panelCartasDelMazoDeDescartes.setToolTipText("Mazo de descartes (" + cartasDelMazoDeDescartes.size() + ")");
-            panelMazoDeDescartes.setLocation(0, 400);
             panelMazoDeDescartes.add(panelCartasDelMazoDeDescartes);
+        } else {
+            if(panelMazoDeDescartes!=null) panelMazoDeDescartes.removeAll();
         }
     }
 
@@ -635,10 +752,10 @@ public class VistaGrafica extends JFrame implements IVista {
     public void avisarTurno() {
         if(panelTextoTurno == null){
             panelTextoTurno = new JPanel();
-            panelTextoTurno.setSize(200, 100);
+            panelTextoTurno.setSize(Const.SIZE_TEXTO_TURNO_X, Const.SIZE_TEXTO_TURNO_Y);
             panelTextoTurno.setVisible(true);
             panelTextoTurno.setOpaque(false);
-            panelTextoTurno.setLocation(300, 0);
+            panelTextoTurno.setLocation(Const.LOC_TEXTO_TURNO_X, Const.LOC_TEXTO_TURNO_Y);
             capas.add(panelTextoTurno, JLayeredPane.POPUP_LAYER);
         } else {
             panelTextoTurno.removeAll();
@@ -649,10 +766,10 @@ public class VistaGrafica extends JFrame implements IVista {
 
         if(controlador.esSuTurno()){
             labelTexto.setText("*** TU TURNO ***");
-            mostrarTextoInformativo("Juega una carta haciendo click en ella, o descarta si no tienes opciones");
+            mostrarTextoInformativo(Const.TXT_JUEGA_UNA_CARTA);
         } else {
             labelTexto.setText("*** TURNO DE " + controlador.getTurnoJugador().getNombre() + " ***");
-            mostrarTextoInformativo("Espera a que tu rival juegue su turno");
+            mostrarTextoInformativo(Const.TXT_ESPERA_QUE_EL_RIVAL_JUEGUE);
         }
     }
 
@@ -661,9 +778,10 @@ public class VistaGrafica extends JFrame implements IVista {
         int numCarta = Integer.parseInt(cartaSeleccionada.getName());
         if(controlador.accionarCarta(numCarta)){
             controlador.finDeTurno();
+            botonJugar.setVisible(false);
         } else {
             //mostrarMesa();
-            mostrarTextoInformativo("No puedes jugar esa carta, intenta con otra.");
+            mostrarTextoInformativo(Const.TXT_NO_PUEDES_JUGAR_CARTA);
         }
     }
 

@@ -124,20 +124,14 @@ public class Juego implements IObservable {
             if(!organoACurar.esInmune()){
                 jugador.getCuerpoJugador().curarOrgano(medicina);
 
-                // Si se vuelve inmune al aplicar la medicina, la elimino y la agrego al mazo de descartes
-                if(organoACurar.esInmune()){
-                    Medicina[] medicinasExtraidas = organoACurar.extraerMedicinas();
-                    mazoDeDescarte.agregarCarta(medicinasExtraidas[0]);
-                    mazoDeDescarte.agregarCarta(medicinasExtraidas[1]);
-                    jugador.getCuerpoJugador().eliminarMedicinas(organoACurar);
-                } else {
+                // Si es inmune, no hago nada. Las medicinas quedan ahí
+                if(!organoACurar.esInmune()){
                     if(organoACurar.getInfecciones().size() == 1 && organoACurar.getMedicinas().size() == 1){
                         mazoDeDescarte.agregarCarta(organoACurar.getMedicinas().get(0));
                         mazoDeDescarte.agregarCarta(organoACurar.getInfecciones().get(0));
                         jugador.getCuerpoJugador().eliminarInfeccionYMedicina(organoACurar);
                     }
                 }
-
                 jugador.eliminarCartaDeLaMano(medicina);
                 return true;
             }
