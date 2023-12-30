@@ -36,7 +36,6 @@ public class VistaConsola extends JFrame implements IVista {
             public void actionPerformed(ActionEvent e) {
                 switch (accionVista){
                     case NUEVO_JUGADOR: {
-                        borrarTexto();
                         ingresarNuevoJugador();
                         break;
                     }
@@ -54,7 +53,7 @@ public class VistaConsola extends JFrame implements IVista {
                         break;
                     }
                     case GAME_OVER: {
-                        mostrarTextoEnNuevaLinea("El juego ya terminó...");
+                        mostrarTextoEnNuevaLinea("La partida ya terminó...");
                         break;
                     }
                     default: {
@@ -108,24 +107,30 @@ public class VistaConsola extends JFrame implements IVista {
     public void jugadorRealizaUnaAccion(){
         // Controla que el numero de carta elegida sea 1, 2 o 3. Si es cero, es un descarte.
         // Si no es ninguno, muestro error.
-        int numAccion = Integer.parseInt(textoUsuario.getText().trim());
-        if(numAccion == 1 || numAccion == 2 || numAccion == 3){
-            if (controlador.accionarCarta(numAccion)){
-                controlador.finDeTurno();
+        try {
+            int numAccion = Integer.parseInt(textoUsuario.getText().trim());
+            if(numAccion == 1 || numAccion == 2 || numAccion == 3){
+                if (controlador.accionarCarta(numAccion)){
+                    controlador.finDeTurno();
+                } else {
+                    mostrarMesa();
+                    noPuedeJugarEsaCarta();
+                }
             } else {
-                mostrarMesa();
-                noPuedeJugarEsaCarta();
+                if(numAccion == 0){
+                    //Descartar cartas
+                    mostrarTextoEnNuevaLinea("Elige qué cartas descartar (Ejemplo: 1, 2, 3 (separados con coma)): ");
+                    setAccionVista(AccionVista.DESCARTAR_CARTAS);
+                } else {
+                    mostrarMesa();
+                    accionIncorrecta();
+                }
             }
-        } else {
-            if(numAccion == 0){
-                //Descartar cartas
-                mostrarTextoEnNuevaLinea("Elige qué cartas descartar (Ejemplo: 1, 2, 3 (separados con coma)): ");
-                setAccionVista(AccionVista.DESCARTAR_CARTAS);
-            } else {
-                mostrarMesa();
-                accionIncorrecta();
-            }
+        } catch (NumberFormatException e) {
+            mostrarMesa();
+            mostrarTextoEnNuevaLinea("Debe ingresar un número para poder jugar.");
         }
+
         borrarInputUsuario();
     }
 
@@ -161,6 +166,9 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void elegirCartasADescartar(){
+        // Controlar con regex el formato que me envian
+        // También controlar que sean números
+        // Y controlar que siempre se envíen en el rango 1,2 o 3.
         String indicesSeparadosConComa = textoUsuario.getText().trim();
 
         // Separo cada indice con coma
@@ -170,12 +178,28 @@ public class VistaConsola extends JFrame implements IVista {
             accionIncorrecta();
         } else {
             // pongo cada indice en un array de ints
+            boolean indicesValidos = true;
             int[] indicesCartasADescartar = new int[indicesStr.length];
             for (int i = 0; i < indicesStr.length; i++) {
-                indicesCartasADescartar[i] = Integer.parseInt(indicesStr[i].trim());
+                try {
+                    // Verifico que cada numero sea entre 1 y 3
+                    if(Integer.parseInt(indicesStr[i]) > 0 && Integer.parseInt(indicesStr[i]) <= 3){
+                        indicesCartasADescartar[i] = Integer.parseInt(indicesStr[i].trim());
+                    } else {
+                        indicesValidos = false;
+                        mostrarTextoEnNuevaLinea("Debe elegir cartas para descartar entre 1 y 3.");
+                        break;
+                    }
+                } catch (NumberFormatException e){
+                    mostrarTextoEnNuevaLinea("Solo puede elegir los números de cartas separados con coma, corrobore.");
+                    indicesValidos = false;
+                    break;
+                }
             }
-            controlador.descartarCartas(indicesCartasADescartar);
-            controlador.finDeTurno();
+            if(indicesValidos){
+                controlador.descartarCartas(indicesCartasADescartar);
+                controlador.finDeTurno();
+            }
         }
         borrarInputUsuario();
 
@@ -193,7 +217,7 @@ public class VistaConsola extends JFrame implements IVista {
     @Override
     public void vistaInicial(){
         borrarTexto();
-        mostrarTextoEnNuevaLinea("¡Bienvenido al juego de cartas VIRUS!");
+        mostrarTextoEnNuevaLinea("¡Bienvenido a Virus, el juego de cartas más contagioso!");
         mostrarReglas();
         separadorLinea();
         mostrarTablaDeGanadores();
@@ -203,7 +227,7 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void avisarEsperaALosDemasJugadores(){
-        mostrarTextoEnNuevaLinea("Espere a que los demás jugadores estén listos...");
+        mostrarTextoEnNuevaLinea("Espere a que tu rival esté listo...");
     }
 
     @Override
@@ -301,9 +325,18 @@ public class VistaConsola extends JFrame implements IVista {
 
     @Override
     public void ingresarNuevoJugador(){
-        String nombre = textoUsuario.getText().trim();
-        controlador.nuevoJugador(nombre);
-        borrarInputUsuario();
+        if(controlador.getJugador() == null){
+            String nombre = textoUsuario.getText().trim().toUpperCase();
+            if(!nombre.isEmpty()){
+                controlador.nuevoJugador(nombre);
+                borrarInputUsuario();
+            } else {
+                mostrarTextoEnNuevaLinea("No puedes dejar el nombre vacío.");
+            }
+        } else {
+            mostrarTextoEnNuevaLinea("Ya ingresó su nombre, ahora espera a tu rival.");
+        }
+
     }
 
     private String getNombreJugadorControlador(){

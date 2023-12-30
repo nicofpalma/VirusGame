@@ -280,11 +280,12 @@ public class Juego implements IObservable {
                 }
 
                 // Si no tiene ninguna infección, entonces ese jugador es el ganador :)
+                // Descomentar esto luego
                 if(!tieneAlgunaInfeccion){
                     this.ganador = jugadores.get(i);
-                    String nombreGanador = ganador.getNombre();
-                    String nombrePerdedor = getRival(ganador).getNombre();
-                    SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
+                //    String nombreGanador = ganador.getNombre();
+                //    String nombrePerdedor = getRival(ganador).getNombre();
+                //    SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
                     notificarCambio(AccionModelo.GAME_OVER);
                 }
             }

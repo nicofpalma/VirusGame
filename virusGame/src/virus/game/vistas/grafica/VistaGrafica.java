@@ -34,6 +34,7 @@ public class VistaGrafica extends JFrame implements IVista {
     private JButton botonCancelarDescarte;
     private JButton botonJugar;
     private JPanel panelTextoTurno;
+    private JLabel textoTurno;
     private JLayeredPane capas;
     private JLabel cartaSeleccionada = null;
     private ArrayList<JLabel> cartasSeleccionadasParaDescartar;
@@ -45,7 +46,7 @@ public class VistaGrafica extends JFrame implements IVista {
      * Constructor de la vista gráfica
      * */
     public VistaGrafica(){
-        setTitle("Virus - Vista Grafica");
+        setTitle("Virus - El juego de cartas más contagioso");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
         setLocationRelativeTo(null);
@@ -62,10 +63,33 @@ public class VistaGrafica extends JFrame implements IVista {
         campoNombre.setColumns(15);
         botonConfirmar = new JButton("Confirmar");
 
-        panelIngresoNombre = new JPanel();
+        panelIngresoNombre = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelIngresoNombre.add(new JLabel("Nombre: "));
         panelIngresoNombre.add(campoNombre);
         panelIngresoNombre.add(botonConfirmar);
+
+        JLabel labelEspacio = new JLabel("                                                                            ");
+        panelIngresoNombre.add(labelEspacio);
+
+        JButton botonReglas = new JButton("Ver reglas");
+        panelIngresoNombre.add(botonReglas);
+
+        botonReglas.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarReglas();
+            }
+        });
+
+        JButton botonGanadores = new JButton("Ver ganadores");
+        panelIngresoNombre.add(botonGanadores);
+
+        botonGanadores.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarTablaDeGanadores();
+            }
+        });
 
         add(panelIngresoNombre, BorderLayout.SOUTH);
 
@@ -199,6 +223,11 @@ public class VistaGrafica extends JFrame implements IVista {
 
                                 cartasSeleccionadasParaDescartar.add(labelCarta);
                             }
+                            break;
+                        }
+                        case GAME_OVER:{
+                            mostrarTextoInformativo("La partida ya terminó...");
+                            break;
                         }
                         default:{
                             break;
@@ -241,43 +270,34 @@ public class VistaGrafica extends JFrame implements IVista {
     }
 
     private void mostrarBienvenida(){
-        textoBienvenida = new JTextArea("¡Bienvenido a Virus Game!");
+        textoBienvenida = new JTextArea("¡Bienvenido a Virus, el juego de cartas más contagioso!\n Ingresa tu nombre en el input debajo: \n");
+        textoBienvenida.setBackground(Color.BLACK);
+        textoBienvenida.setForeground(Color.WHITE);
         textoBienvenida.setEditable(false);
         textoBienvenida.setLineWrap(true);
         textoBienvenida.setWrapStyleWord(true);
 
         add(textoBienvenida, BorderLayout.CENTER);
-
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-        textoBienvenida.append("  OBJETIVO Y REGLAS DEL JUEGO\n");
-        textoBienvenida.append("  --> PARA GANAR: Tener en tu cuerpo (tu mesa) las 4 cartas de órganos diferentes, sin ninguna infección.\n");
-        textoBienvenida.append("  --> ORGANOS: Cerebro, Corazón, Estómago y Hueso\n");
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-        textoBienvenida.append("  --> VIRUS: Los hay para cada órgano. Sirven para infectar los órganos del rival e impedir que éste gane.\n");
-        textoBienvenida.append("  --> Si se aplican 2 virus sobre un órgano, éste se extirpará del cuerpo (se eliminará).\n");
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-
-        textoBienvenida.append("  --> MEDICINAS: Las hay para cada órgano. Sirven para vacunar tus órganos, mantenerlos a salvo.\n");
-        textoBienvenida.append("  --> Si se aplican 2 medicinas sobre un órgano, éste se volverá inmune a cualquier virus.\n");
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-
-        textoBienvenida.append(" --> Si se aplica un virus sobre un órgano que está vacunado, éste eliminará esa vacuna.\n");
-        textoBienvenida.append(" --> Si se aplica una medicina sobre un órgano que está infectado, éste eliminará ese virus.\n");
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-        textoBienvenida.append(" --> DESCARTAR CARTAS: Durante tu turno, presiona '0' para elegir qué cartas quieres descartar.\n");
-        textoBienvenida.append(" --> En cada turno tendremos 3 cartas en la mano. Podés jugar una, o descartar hasta las 3 cartas.\n");
-        textoBienvenida.append(" --> Habrá ocasiones en las que no podrás jugar ninguna carta, te verás obligado a descartar :)\n");
-        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------\n");
-
-        textoBienvenida.append("Para iniciar, ingrese su nombre en el input que está debajo: \n");
     }
 
 
     @Override
     public void ingresarNuevoJugador() {
-        String nombre = campoNombre.getText().trim().toUpperCase();
-        controlador.nuevoJugador(nombre);
-        campoNombre.setText("");
+        if(controlador.getJugador() == null){
+            String nombre = campoNombre.getText().trim().toUpperCase();
+            if(!nombre.isEmpty()){
+                controlador.nuevoJugador(nombre);
+                campoNombre.setText("");
+            } else {
+                textoBienvenida.setText("");
+                textoBienvenida.append("No puedes dejar el nombre vacío.\n");
+            }
+        } else {
+            textoBienvenida.setText("");
+            textoBienvenida.append("Ya ingresó su nombre, ahora espera a tu rival.\n");
+        }
+
+
     }
 
     @Override
@@ -471,7 +491,6 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void mostrarMesa() {
-        System.out.println("Entré a mostrar mesa");
         // Elimina todo el panel de ingreso de nombre, para poder empezar a jugar y mostrar las cartas.
         if(panelIngresoNombre != null){
             getContentPane().remove(campoNombre);
@@ -505,7 +524,7 @@ public class VistaGrafica extends JFrame implements IVista {
         capas.setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
 
         // Agrego una imágen de fondo
-        ImageIcon background = new ImageIcon("./src/virus/game/modelos/cartas/img/fondo4.jpg");
+        ImageIcon background = new ImageIcon("./src/virus/game/modelos/cartas/img/fondo3.jpg");
         JLabel backgroundLabel = new JLabel(background);
         backgroundLabel.setBounds(0, 0, background.getIconWidth(), background.getIconHeight());
 
@@ -533,18 +552,18 @@ public class VistaGrafica extends JFrame implements IVista {
         // Muestra el nombre del jugador y del rival
         textoNombreJugador = new JLabel(controlador.getJugador().getNombre());
         textoNombreJugador.setForeground(Color.WHITE);
-        textoNombreJugador.setSize(100, 100);
+        textoNombreJugador.setSize(Const.SIZE_NOMBRE_JUGADOR_X, Const.SIZE_NOMBRE_JUGADOR_Y);
         textoNombreJugador.setOpaque(false);
-        textoNombreJugador.setLocation(690, 282);
+        textoNombreJugador.setLocation(Const.LOC_NOMBRE_JUGADOR_X, Const.LOC_NOMBRE_JUGADOR_Y);
         textoNombreJugador.setVisible(true);
         textoNombreJugador.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
         textoNombreJugador.setToolTipText("Tú");
 
         textoNombreRival = new JLabel(controlador.getRival().getNombre());
         textoNombreRival.setForeground(Color.WHITE);
-        textoNombreRival.setSize(100, 100);
+        textoNombreRival.setSize(Const.SIZE_NOMBRE_JUGADOR_X, Const.SIZE_NOMBRE_JUGADOR_Y);
         textoNombreRival.setOpaque(false);
-        textoNombreRival.setLocation(690, 75);
+        textoNombreRival.setLocation(Const.LOC_NOMBRE_JUGADOR_X, Const.LOC_NOMBRE_RIVAL_Y);
         textoNombreRival.setVisible(true);
         textoNombreRival.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
         textoNombreRival.setToolTipText("Rival");
@@ -632,7 +651,7 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void avisarEsperaALosDemasJugadores() {
-        textoBienvenida.append("Espere a que los demás jugadores estén listos...\n");
+        textoBienvenida.append("Espere a que tu rival esté listo...\n");
     }
 
     // Muestra el mazo
@@ -750,25 +769,25 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void avisarTurno() {
+        // Crea el panel de texto que avisa de quien es el turno
+        // También, al final avisa quién es el ganador
         if(panelTextoTurno == null){
             panelTextoTurno = new JPanel();
             panelTextoTurno.setSize(Const.SIZE_TEXTO_TURNO_X, Const.SIZE_TEXTO_TURNO_Y);
             panelTextoTurno.setVisible(true);
             panelTextoTurno.setOpaque(false);
             panelTextoTurno.setLocation(Const.LOC_TEXTO_TURNO_X, Const.LOC_TEXTO_TURNO_Y);
+            textoTurno = new JLabel();
+            textoTurno.setForeground(Color.white);
+            panelTextoTurno.add(textoTurno);
             capas.add(panelTextoTurno, JLayeredPane.POPUP_LAYER);
-        } else {
-            panelTextoTurno.removeAll();
         }
-        JLabel labelTexto = new JLabel();
-        labelTexto.setForeground(Color.white);
-        panelTextoTurno.add(labelTexto);
 
         if(controlador.esSuTurno()){
-            labelTexto.setText("*** TU TURNO ***");
+            textoTurno.setText("*** TU TURNO ***");
             mostrarTextoInformativo(Const.TXT_JUEGA_UNA_CARTA);
         } else {
-            labelTexto.setText("*** TURNO DE " + controlador.getTurnoJugador().getNombre() + " ***");
+            textoTurno.setText("*** TURNO DE " + controlador.getTurnoJugador().getNombre() + " ***");
             mostrarTextoInformativo(Const.TXT_ESPERA_QUE_EL_RIVAL_JUEGUE);
         }
     }
@@ -802,21 +821,50 @@ public class VistaGrafica extends JFrame implements IVista {
 
     @Override
     public void avisarQueElJugadorGano() {
-
+        textoTurno.setText("*** ¡" + textoNombreJugador.getText() + ", ERES EL GANADOR, FELICITACIONES! ***");
+        botonDescartar.setVisible(false);
+        mostrarTextoInformativo("Has logrado un gran desempeño y ganaste la partida.");
     }
 
     @Override
     public void avisarQueElJugadorPerdio() {
-
+        textoTurno.setText("*** " + textoNombreJugador.getText() + ", HAS PERDIDO. " + textoNombreRival.getText() + " ES EL GANADOR. ***");
+        mostrarTextoInformativo("¡Te deseamos más suerte la próxima vez!");
     }
 
     @Override
     public void mostrarTablaDeGanadores() {
-
+        textoBienvenida.setText("");
+        textoBienvenida.append(controlador.buscarTablaDeGanadores());
     }
 
     @Override
     public void mostrarReglas() {
+        textoBienvenida.setText("");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append("  OBJETIVO Y REGLAS DEL JUEGO\n");
+        textoBienvenida.append("  --> PARA GANAR: Tener en tu cuerpo (tu mesa) las 4 cartas de órganos diferentes, sin ninguna infección.\n");
+        textoBienvenida.append("  --> ORGANOS: Cerebro, Corazón, Estómago y Hueso\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append("  --> VIRUS: Los hay para cada órgano. Sirven para infectar los órganos del rival e impedir que éste gane.\n");
+        textoBienvenida.append("  --> Si se aplican 2 virus sobre un órgano, éste se extirpará del cuerpo (el órgano se enviará a descartes, junto con los virus aplicados).\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append("  --> MEDICINAS: Las hay para cada órgano. Sirven para vacunar tus órganos, mantenerlos a salvo.\n");
+        textoBienvenida.append("  --> Si se aplican 2 medicinas sobre un órgano, éste se volverá inmune a cualquier virus (verás dos cartas de medicina sobre el órgano).\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append(" --> Si se aplica un virus sobre un órgano que está vacunado, éste eliminará esa vacuna (tanto el virus como la medicina se enviarán a descartes).\n");
+        textoBienvenida.append(" --> Si se aplica una medicina sobre un órgano que está infectado, éste eliminará ese virus (tanto la medicina como el virus se enviarán a descartes).\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append(" --> DESCARTAR CARTAS: Durante tu turno, presiona el botón 'Descartar' en la parte inferior izquierda de la pantalla, haz click sobre las cartas que quieres descartar y presiona el botón 'Confirmar'.\n");
+        textoBienvenida.append(" --> En cada turno tendrás 3 cartas en la mano. Podrás jugar una, o descartar hasta las 3 cartas.\n");
+        textoBienvenida.append(" --> Habrá ocasiones en las que no podrás jugar ninguna carta, así que te verás obligado a descartar.\n");
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
+        textoBienvenida.append(" --> TIPS \n");
+        textoBienvenida.append(" --> Para jugar una carta, haz click en ella y luego en el botón 'Jugar' en la esquina inferior derecha. Si no se puede jugar esa carta, habrá un texto informativo en la parte superior que te lo indicará.\n");
+        textoBienvenida.append(" --> Para ver qué tipo de carta es alguna de las que se muestra en pantalla, deja el mouse posado sobre ella y te indicará su nombre, y si es un órgano, si está infectado, inmune o vacunado.\n");
+        textoBienvenida.append(" --> En la esquina inferior izquierda podrás ver las últimas 3 cartas enviadas a descartes.\n");
+        textoBienvenida.append(" --> En la esquina superior derecha podrás ver cuántas cartas quedan en el mazo si te posas sobre él. No te preocupes, cuando el mazo se quede sin cartas, se reciclará con el mazo de descartes.\n");
 
+        textoBienvenida.append("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     }
 }

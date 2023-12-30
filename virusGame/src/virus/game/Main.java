@@ -8,12 +8,12 @@ import virus.game.vistas.grafica.VistaGrafica;
 
 import javax.swing.*;
 
-public class EjecucionJuegoVirus {
+public class Main {
     public static void main(String[] args)
     {
         SwingUtilities.invokeLater(() -> {
             // Genero las vistas
-            IVista vista1 = new VistaGrafica();
+            IVista vista1 = new VistaConsola();
             IVista vista2 = new VistaGrafica();
 
             // Creo el modelo del juego y lo asigno a cada controlador, con cada vista

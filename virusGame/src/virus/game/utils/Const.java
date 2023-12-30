@@ -7,16 +7,9 @@ public class Const {
     public static final int ANCHO_VENTANA = 800;
     public static final int ALTO_VENTANA = 600;
     public static final Color COLOR_VIOLETA = new Color(153, 64, 133);
-
-    // Tamaño mano jugador en X
     public static final int SIZE_MANO_JUGADOR_X = 350;
-
-    // Tamaño mano jugador en Y
     public static final int SIZE_MANO_JUGADOR_Y = 250;
-
-    // Ubicacion mano jugador en X
     public static final int LOC_MANO_JUGADOR_X = 210;
-    // Ubicacion mano jugador en Y
     public static final int LOC_MANO_JUGADOR_Y = 420;
     public static final int ESPACIO_BORDE_SELECCION_CARTA = -4;
     public static final int SIZE_TEXTO_INFORMATIVO_X = 500;
@@ -45,17 +38,18 @@ public class Const {
     public static final int LOC_MAZO_Y = 50;
     public static final int SIZE_IMG_MAZO_X = 75;
     public static final int SIZE_IMG_MAZO_Y = 110;
-    public static final int SIZE_TEXTO_TURNO_X = 200;
+    public static final int SIZE_TEXTO_TURNO_X = 400;
     public static final int SIZE_TEXTO_TURNO_Y = 100;
-    public static final int LOC_TEXTO_TURNO_X = 300;
+    public static final int LOC_TEXTO_TURNO_X = 200;
     public static final int LOC_TEXTO_TURNO_Y = 0;
     public static final String TXT_JUEGA_UNA_CARTA = "Juega una carta haciendo click en ella, o descarta si no tienes opciones";
     public static final String TXT_ESPERA_QUE_EL_RIVAL_JUEGUE = "Espera a que tu rival juegue su turno";
-
     public static final String TXT_NO_PUEDES_JUGAR_CARTA = "No puedes jugar esa carta, intenta con otra";
-
-
-
+    public static final int SIZE_NOMBRE_JUGADOR_X = 100;
+    public static final int SIZE_NOMBRE_JUGADOR_Y = 100;
+    public static final int LOC_NOMBRE_JUGADOR_X = 690;
+    public static  final int LOC_NOMBRE_JUGADOR_Y = 282;
+    public static final int LOC_NOMBRE_RIVAL_Y = 75;
 
 
 
