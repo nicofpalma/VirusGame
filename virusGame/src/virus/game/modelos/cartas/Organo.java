@@ -3,9 +3,13 @@ package virus.game.modelos.cartas;
 import virus.game.modelos.Carta;
 import virus.game.modelos.Color;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public final class Organo extends Carta{
+public final class Organo extends Carta implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     // Solo pueden guardar 2 infecciones o vacunas como máximo
     private ArrayList<Virus> infecciones;
     private ArrayList<Medicina> medicinas;

@@ -4,9 +4,13 @@ import virus.game.modelos.cartas.Medicina;
 import virus.game.modelos.cartas.Organo;
 import virus.game.modelos.cartas.Virus;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Cuerpo {
+public class Cuerpo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private ArrayList<Organo> organos;
 
     public Cuerpo(){

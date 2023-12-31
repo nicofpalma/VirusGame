@@ -226,8 +226,23 @@ public class VistaConsola extends JFrame implements IVista {
     }
 
     @Override
+    public void mostrarTextoInformativo(String texto) {
+
+    }
+
+    @Override
+    public void mostrarBienvenida() {
+
+    }
+
+    @Override
     public void avisarEsperaALosDemasJugadores(){
         mostrarTextoEnNuevaLinea("Espere a que tu rival esté listo...");
+    }
+
+    @Override
+    public void mostrarMazoDeDescartes() {
+
     }
 
     @Override
@@ -260,6 +275,16 @@ public class VistaConsola extends JFrame implements IVista {
         mostrarElegirCarta();           // Opciones de acciones
         separadorLinea();
         avisarTurno();                  // Avisar de quien es el turno
+    }
+
+    @Override
+    public void iniciarVistaYControlarEventos() {
+
+    }
+
+    @Override
+    public void mostrarBotonDescartar() {
+
     }
 
 

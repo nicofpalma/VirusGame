@@ -9,6 +9,10 @@ public interface IVista {
 
     void vistaInicial();
 
+    void mostrarTextoInformativo(String texto);
+
+    void mostrarBienvenida();
+
     void ingresarNuevoJugador();
 
     void setAccionVista(AccionVista accion);
@@ -25,7 +29,15 @@ public interface IVista {
 
     void mostrarMesa();
 
+    void iniciarVistaYControlarEventos();
+
+    // Muestra el boton para descartar cartas solo cuando es su turno
+    void mostrarBotonDescartar();
+
     void avisarEsperaALosDemasJugadores();
+
+    // Muestra el mazo de descartes
+    void mostrarMazoDeDescartes();
 
     void avisarTurno();
 

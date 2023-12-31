@@ -3,8 +3,13 @@ package virus.game.modelos;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.Serial;
+import java.io.Serializable;
 
-public abstract class Carta {
+public abstract class Carta implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
     // Color de la carta
     private final Color color;
 

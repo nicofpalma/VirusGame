@@ -5,11 +5,15 @@ import virus.game.modelos.cartas.Organo;
 import virus.game.modelos.cartas.Virus;
 
 import java.io.File;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Mazo {
+public class Mazo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     // Lista de cartas que guarda el mazo
     private ArrayList<Carta> cartas;
 

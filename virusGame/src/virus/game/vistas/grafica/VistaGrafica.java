@@ -15,9 +15,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class VistaGrafica extends JFrame implements IVista {
+public class VistaGrafica extends JFrame implements IVista, Serializable {
+    @Serial
+    private static final long serialVersionUID = -1109397795690209052L;
     private AccionVista accionVista;
     private Controlador controlador;
     private JPanel panelManoJugador;
@@ -45,7 +49,7 @@ public class VistaGrafica extends JFrame implements IVista {
     /**
      * Constructor de la vista gráfica
      * */
-    public VistaGrafica(){
+    public VistaGrafica() {
         setTitle("Virus - El juego de cartas más contagioso");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
@@ -249,7 +253,8 @@ public class VistaGrafica extends JFrame implements IVista {
         this.accionVista = AccionVista.NUEVO_JUGADOR;
     }
 
-    private void mostrarTextoInformativo(String texto){
+    @Override
+    public void mostrarTextoInformativo(String texto){
         if(panelTextoInformativo == null){
             panelTextoInformativo = new JPanel();
             panelTextoInformativo.setSize(Const.SIZE_TEXTO_INFORMATIVO_X, Const.SIZE_TEXTO_INFORMATIVO_Y);
@@ -269,7 +274,9 @@ public class VistaGrafica extends JFrame implements IVista {
         panelTextoInformativo.repaint();
     }
 
-    private void mostrarBienvenida(){
+    @Override
+    public void mostrarBienvenida(){
+        System.out.println("Entré a mostrar bienvenida");
         textoBienvenida = new JTextArea("¡Bienvenido a Virus, el juego de cartas más contagioso!\n Ingresa tu nombre en el input debajo: \n");
         textoBienvenida.setBackground(Color.BLACK);
         textoBienvenida.setForeground(Color.WHITE);
@@ -518,6 +525,7 @@ public class VistaGrafica extends JFrame implements IVista {
         capas.repaint();
     }
 
+    @Override
     public void iniciarVistaYControlarEventos(){
         // Agrego capas para poder manejar varios elementos simultaneos
         capas = new JLayeredPane();
@@ -645,6 +653,7 @@ public class VistaGrafica extends JFrame implements IVista {
     }
 
     // Muestra el boton para descartar cartas solo cuando es su turno
+    @Override
     public void mostrarBotonDescartar() {
         botonDescartar.setVisible(controlador.esSuTurno());
     }
@@ -721,6 +730,7 @@ public class VistaGrafica extends JFrame implements IVista {
     }
 
     // Muestra el mazo de descartes
+    @Override
     public void mostrarMazoDeDescartes(){
         ArrayList<Carta> cartasDelMazoDeDescartes = controlador.getCartasDelMazoDeDescartes();
 

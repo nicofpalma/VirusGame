@@ -2,9 +2,14 @@ package virus.game.modelos;
 
 import virus.game.modelos.cartas.Organo;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Jugador {
+public class Jugador implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private String nombre;
     private static int cantidadJugadores;
     private int numeroDeJugador;
@@ -34,6 +39,20 @@ public class Jugador {
         return mano;
     }
 
+    /*
+
+    // Override de "equals" para solucionar el problema de aliasing con RMI
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Jugador jugador = (Jugador) obj;
+
+        return Objects.equals(nombre, jugador.nombre) &&
+                Objects.equals(numeroDeJugador, jugador.numeroDeJugador);
+    } */
+
 
     /* Retorna las cartas de la mano en un string concatenado */
     public String verCartasManoString(){
@@ -56,6 +75,10 @@ public class Jugador {
             mano.add(nuevaCarta);
             return true;
         }
+    }
+
+    public void setGanador(){
+        ganador = true;
     }
 
     public void eliminarCartaDeLaMano(Carta carta){

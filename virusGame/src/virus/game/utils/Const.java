@@ -1,9 +1,13 @@
 package virus.game.utils;
 
 import java.awt.*;
+import java.io.Serial;
+import java.io.Serializable;
 
 // Esta clase solo contiene constantes usadas en la vista gráfica
-public class Const {
+public class Const implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 3916841880017339074L;
     public static final int ANCHO_VENTANA = 800;
     public static final int ALTO_VENTANA = 600;
     public static final Color COLOR_VIOLETA = new Color(153, 64, 133);
