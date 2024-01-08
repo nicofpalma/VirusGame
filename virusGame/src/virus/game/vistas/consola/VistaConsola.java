@@ -53,7 +53,7 @@ public class VistaConsola extends JFrame implements IVista {
                         break;
                     }
                     case GAME_OVER: {
-                        mostrarTextoEnNuevaLinea("La partida ya terminó...");
+                        revanchaYSalir();
                         break;
                     }
                     default: {
@@ -91,7 +91,25 @@ public class VistaConsola extends JFrame implements IVista {
         separadorLinea();
         mostrarTextoEnNuevaLinea("¡FELICITACIONES " + controlador.getJugadorGanador().getNombre() + ", GANASTE EL JUEGO!");
         separadorLinea();
-        mostrarTextoEnNuevaLinea("Para volver a jugar, cierre y vuelve a abrir el juego.");
+        mostrarTextoEnNuevaLinea("Para jugar revancha, escriba '1'. Para salir, '0'.");
+    }
+
+    @Override
+    public void revanchaYSalir() {
+        try {
+            int numAccion = Integer.parseInt(textoUsuario.getText().trim());
+            if(numAccion == 1){
+                controlador.jugarRevancha();
+                mostrarTextoEnNuevaLinea("Espera a que tu rival acepte jugar revancha.");
+            }
+            if(numAccion == 0){
+                // Salir
+                dispose();
+                System.exit(0);
+            }
+        } catch (NumberFormatException e){
+            mostrarTextoEnNuevaLinea("Debe ingresar un número, 0 para salir, 1 para jugar revancha.");
+        }
     }
 
     @Override
@@ -100,7 +118,7 @@ public class VistaConsola extends JFrame implements IVista {
         separadorLinea();
         mostrarTextoEnNuevaLinea("PERDISTE. LO SENTIMOS, " + controlador.getJugadorGanador().getNombre() + " ES EL GANADOR. TE DESEO MÁS SUERTE LA PRÓXIMA VEZ :)");
         separadorLinea();
-        mostrarTextoEnNuevaLinea("Para volver a jugar, cierre y vuelve a abrir el juego.");
+        mostrarTextoEnNuevaLinea("Para jugar revancha, escriba '1'. Para salir, '0'.");
     }
 
     @Override

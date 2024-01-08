@@ -19,8 +19,8 @@ public final class Organo extends Carta implements Serializable {
     private boolean extirpado;
 
     // Constructor que setea solo el color, el resto lo deja nulo.
-    public Organo(Color color, String nombre, String nombreImagen){
-        super(color, nombre, nombreImagen);
+    public Organo(Color color, String nombre, String nombreImagen, String descripcion){
+        super(color, nombre, nombreImagen, descripcion);
         this.infecciones = new ArrayList<Virus>(2);
         this.medicinas = new ArrayList<Medicina>(2);
         this.inmune = false;

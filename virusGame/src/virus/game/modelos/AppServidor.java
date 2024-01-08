@@ -30,17 +30,17 @@ public class AppServidor {
                 8888
         );
 
-        SwingUtilities.invokeLater(()-> {
-            IModelo modelo = new Modelo();
-            Servidor servidor = new Servidor(ip, Integer.parseInt(port));
-            try {
-                servidor.iniciar(modelo);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (RMIMVCException e) {
-                e.printStackTrace();
-            }
-        });
+
+        IModelo modelo = new Modelo();
+        Servidor servidor = new Servidor(ip, Integer.parseInt(port));
+        try {
+            servidor.iniciar(modelo);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (RMIMVCException e) {
+            e.printStackTrace();
+        }
+
 
     }
 }

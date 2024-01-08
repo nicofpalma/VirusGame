@@ -10,7 +10,7 @@ public class Virus extends Carta implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     // Constructor del virus
-    public Virus(Color color, String nombre, String nombreImagen){
-        super(color, nombre, nombreImagen);
+    public Virus(Color color, String nombre, String nombreImagen, String descripcion){
+        super(color, nombre, nombreImagen, descripcion);
     }
 }

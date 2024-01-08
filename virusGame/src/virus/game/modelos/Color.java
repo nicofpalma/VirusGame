@@ -6,7 +6,12 @@ import java.io.Serializable;
 // Colores de las cartas
 public enum Color implements Serializable {
 
-    ROJO("Rojo"), VERDE("Verde"), AZUL("Azul"), AMARILLO("Amarillo"), MULTICOLOR("Multicolor");
+    ROJO("Rojo"),
+    VERDE("Verde"),
+    AZUL("Azul"),
+    AMARILLO("Amarillo"),
+    MULTICOLOR("Multicolor"),
+    INCOLORO("Incolora");
 
     @Serial
     private static final long serialVersionUID = 1L;

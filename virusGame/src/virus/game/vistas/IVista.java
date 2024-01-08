@@ -51,6 +51,8 @@ public interface IVista {
 
     void avisarQueElJugadorGano();
 
+    void revanchaYSalir();
+
     void avisarQueElJugadorPerdio();
 
     void mostrarTablaDeGanadores();

@@ -13,14 +13,12 @@ public class Jugador implements Serializable {
     private String nombre;
     private static int cantidadJugadores;
     private int numeroDeJugador;
-    private boolean ganador;
     private ArrayList<Carta> mano;
     private Cuerpo cuerpoJugador;
     public Jugador(String nombre){
         this.nombre = nombre;
         ++Jugador.cantidadJugadores;
         numeroDeJugador = cantidadJugadores;
-        this.ganador = false;
         this.mano = new ArrayList<Carta>(3);
         this.cuerpoJugador = new Cuerpo();
     }
@@ -31,27 +29,21 @@ public class Jugador implements Serializable {
     public static int getCantidadJugadores() {
         return cantidadJugadores;
     }
-    public boolean esGanador() {
-        return ganador;
-    }
 
     public ArrayList<Carta> getMano() {
         return mano;
     }
 
-    /*
+    public void setCuerpoJugador(Cuerpo nuevoCuerpoJugador){
+        this.cuerpoJugador = nuevoCuerpoJugador;
+    }
 
-    // Override de "equals" para solucionar el problema de aliasing con RMI
-    @Override
-    public boolean equals(Object obj){
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+    // Reinicia los atributos del jugador
+    public void reiniciarJugador(){
+        mano = new ArrayList<Carta>(3);
+        cuerpoJugador = new Cuerpo();
 
-        Jugador jugador = (Jugador) obj;
-
-        return Objects.equals(nombre, jugador.nombre) &&
-                Objects.equals(numeroDeJugador, jugador.numeroDeJugador);
-    } */
+    }
 
 
     /* Retorna las cartas de la mano en un string concatenado */
@@ -75,10 +67,6 @@ public class Jugador implements Serializable {
             mano.add(nuevaCarta);
             return true;
         }
-    }
-
-    public void setGanador(){
-        ganador = true;
     }
 
     public void eliminarCartaDeLaMano(Carta carta){

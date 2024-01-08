@@ -22,15 +22,6 @@ public class Controlador implements IControladorRemoto, Serializable {
     private int idRival = -2;   // Inicializo en -2 para controlar cuando todavía no existe un rival
     private AccionModelo accionModelo;
 
-    public <T extends IObservableRemoto> Controlador(IVista vista, T modelo) throws RemoteException {
-        //this.modelo = modelo;
-        this.vista = vista;
-        this.setModeloRemoto(modelo);
-        //this.vista.setControlador(this);
-        //this.modelo.agregarObservador(this);
-        //modelo.iniciarJuego();
-    }
-
     public Controlador(IVista vista){
         this.vista = vista;
     }
@@ -155,7 +146,7 @@ public class Controlador implements IControladorRemoto, Serializable {
         return getCuerpoRival().toString();
     }
 
-    /*
+    /* Antigua implementación
     @Override
     public void actualizar(Object accion) {
         if(accion instanceof AccionModelo){
@@ -235,7 +226,7 @@ public class Controlador implements IControladorRemoto, Serializable {
         try {
             // Sucede cuando es el primer turno
             if (modelo.getTurnoJugador() == null){
-                modelo.cambiarTurnoJugador();
+                modelo.cambiarTurnoJugador(false);
             }
 
             // Avisa de quien es el turno
@@ -252,6 +243,17 @@ public class Controlador implements IControladorRemoto, Serializable {
     public String buscarTablaDeGanadores(){
         SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores();
         return serializadorDeGanadores.generarStringDeGanadores();
+    }
+
+    public void jugarRevancha(){
+        try {
+            modelo.setRevancha(idJugador);
+            if(modelo.seJuegaRevancha()){
+                modelo.reiniciarJuego();
+            }
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

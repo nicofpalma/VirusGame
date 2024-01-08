@@ -9,6 +9,12 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public interface IModelo extends IObservableRemoto {
+    void reiniciarJuego() throws RemoteException;
+
+    void setRevancha(int idJugador) throws RemoteException;
+
+    boolean seJuegaRevancha() throws RemoteException;
+
     void iniciarJuego() throws RemoteException;
 
     boolean realizarAccionDeCarta(int idJugador, int numCarta) throws RemoteException;
@@ -37,7 +43,9 @@ public interface IModelo extends IObservableRemoto {
     Jugador getRival(int idJugador) throws RemoteException;
 
     /* Agrego un nuevo jugador */
+    /*
     void agregarJugador(Jugador jugador) throws RemoteException;
+*/
 
     /* Le da 3 cartas al jugador, se usa cuando se inicia un nuevo juego */
 
@@ -59,8 +67,9 @@ public interface IModelo extends IObservableRemoto {
 
     void darCartasFaltantesJugador(Jugador jugador, int cantidad) throws RemoteException;
 
+
     /* Para terminar el turno de un jugador y dárselo al siguiente */
-    Jugador cambiarTurnoJugador() throws RemoteException;
+    Jugador cambiarTurnoJugador(boolean accionadoPorCarta) throws RemoteException;
 
     // Controlar si algun jugador está en condición de ser ganador
     void controlarGanador() throws RemoteException;

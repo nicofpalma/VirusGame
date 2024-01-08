@@ -152,7 +152,8 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             labelCarta.setName(String.valueOf(i+1));
 
             // Hover con el nombre de la carta
-            labelCarta.setToolTipText(carta.toString());
+            // Se usa <html></html> para poder usar un salto de línea (<br>), ya que "\n" no funciona en el tooltip.
+            labelCarta.setToolTipText("<html>" + carta + "<br>" + carta.getDescripcion() + "</html>");
 
             // Eventos del mouse para las cartas de la mano
             labelCarta.addMouseListener(new MouseAdapter() {
@@ -342,10 +343,9 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                 JLabel labelOrgano = new JLabel(imagenOrgano);
                 labelOrgano.setLayout(new BoxLayout(labelOrgano, BoxLayout.X_AXIS));
 
-                panelDelCuerpo.add(labelOrgano);
-
                 // Hover con nombre y estado de la carta
                 labelOrgano.setToolTipText(organo.toString());
+                panelDelCuerpo.add(labelOrgano);
 
                 if(organo.estaInfectado()){
                     Image imagenInfeccion = organo.getInfecciones().get(0).getImagen()
@@ -466,7 +466,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                         labelOrgano.add(panelMedicinas, BorderLayout.SOUTH);
                     } else {
                         if(organo.tieneMedicina()){
-                            // Agregeo la carta de medicina sobre la carta del organo
+                            // Agrego la carta de medicina sobre la carta del organo
                             Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                     .getImage()
                                     .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
@@ -612,6 +612,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                         controlador.finDeTurno();
                         botonCancelarDescarte.setVisible(false);
                         botonDescartar.setText("Descartar");
+                        setAccionVista(AccionVista.ESPERAR_TURNO);
                     }
                     break;
                 }
@@ -763,7 +764,9 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                         .getScaledInstance(Const.SIZE_IMG_MAZO_X, Const.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
                 JLabel labelCarta = new JLabel(new ImageIcon(imagenCarta));
 
-                labelCarta.setToolTipText(cartasDelMazoDeDescartes.get(i).toString() + " (Descartada)");
+                //labelCarta.setToolTipText(cartasDelMazoDeDescartes.get(i).toString() + " (Descartada)");
+                labelCarta.setToolTipText("<html>" + cartasDelMazoDeDescartes.get(i).toString() + " (Descartada) <br>"
+                        + cartasDelMazoDeDescartes.get(i).getDescripcion() + "</html>");
 
                 panelCartasDelMazoDeDescartes.add(labelCarta);
                 if(i > cantCartasAMostrar){
@@ -834,12 +837,55 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         textoTurno.setText("*** ¡" + textoNombreJugador.getText() + ", ERES EL GANADOR, FELICITACIONES! ***");
         botonDescartar.setVisible(false);
         mostrarTextoInformativo("Has logrado un gran desempeño y ganaste la partida.");
+        revanchaYSalir();
+    }
+
+    @Override
+    public void revanchaYSalir(){
+        // Botón salir
+        JButton botonSalir = new JButton("Salir");
+        botonSalir.setVisible(true);
+        botonSalir.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
+        botonSalir.setLocation(Const.LOC_BTN_DESCARTAR_X, Const.LOC_BTN_Y);
+        capas.add(botonSalir, JLayeredPane.POPUP_LAYER);
+
+        botonSalir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Cierra el juego por completo. (aunque el servidor sí seguirá corriendo)
+                dispose();
+                System.exit(0);
+            }
+        });
+
+        // Botón revancha
+        JButton botonVolverAJugar = new JButton("Revancha");
+        botonVolverAJugar.setVisible(true);
+        botonVolverAJugar.setSize(Const.SIZE_BTN_X + 10, Const.SIZE_BTN_Y);
+        botonVolverAJugar.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        capas.add(botonVolverAJugar, JLayeredPane.POPUP_LAYER);
+
+        botonVolverAJugar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                botonVolverAJugar.setVisible(false);
+                mostrarTextoInformativo("Espera a que tu rival decida si quiere jugar revancha...");
+                controlador.jugarRevancha();
+                panelCuerpoJugador.removeAll();
+                panelCuerpoRival.removeAll();
+                capas.revalidate();
+                capas.repaint();
+
+                botonSalir.setVisible(false);
+            }
+        });
     }
 
     @Override
     public void avisarQueElJugadorPerdio() {
         textoTurno.setText("*** " + textoNombreJugador.getText() + ", HAS PERDIDO. " + textoNombreRival.getText() + " ES EL GANADOR. ***");
         mostrarTextoInformativo("¡Te deseamos más suerte la próxima vez!");
+        revanchaYSalir();
     }
 
     @Override

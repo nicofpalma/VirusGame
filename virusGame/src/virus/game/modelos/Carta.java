@@ -1,8 +1,7 @@
 package virus.game.modelos;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
+import javax.swing.ImageIcon;
+import java.awt.Image;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -18,11 +17,14 @@ public abstract class Carta implements Serializable {
 
     private final ImageIcon imagen;
 
+    private final String descripcion;
+
     // Constructor de la carta
-    public Carta(Color color, String nombre, String nombreImagen){
+    public Carta(Color color, String nombre, String nombreImagen, String descripcion){
         this.color = color;
         this.nombre = nombre;
         this.imagen = cargarImagen(nombreImagen);
+        this.descripcion = descripcion;
     }
 
     // Se encarga de buscar la imágen para cargarla, cuando se le pasa la ruta en el constructor.
@@ -49,6 +51,10 @@ public abstract class Carta implements Serializable {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public String getDescripcion(){
+        return descripcion;
     }
 
 }

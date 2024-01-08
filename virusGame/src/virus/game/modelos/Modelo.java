@@ -3,7 +3,9 @@ package virus.game.modelos;
 import ar.edu.unlu.rmimvc.observer.ObservableRemoto;
 import virus.game.modelos.cartas.Medicina;
 import virus.game.modelos.cartas.Organo;
+import virus.game.modelos.cartas.Tratamiento;
 import virus.game.modelos.cartas.Virus;
+import virus.game.utils.SerializadorDeGanadores;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -19,6 +21,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
     private ArrayList<Jugador> jugadores;
     private Jugador ganador;
     private Jugador turnoJugador;
+    private boolean[] revancha = new boolean[2];
 
     public Modelo(){
         this.jugadores = new ArrayList<Jugador>();
@@ -26,6 +29,33 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
         this.mazoDeDescarte = new Mazo(true);
         this.ganador = null;
         this.turnoJugador = null;
+    }
+
+    @Override
+    public void reiniciarJuego() throws RemoteException {
+        this.mazo = new Mazo(false);
+        this.mazoDeDescarte = new Mazo(true);
+        this.ganador = null;
+        this.turnoJugador = null;
+        revancha[0] = false;
+        revancha[1] = false;
+        for (Jugador jugador : jugadores) {
+            jugador.reiniciarJugador();
+            dar3CartasJugador(jugador);
+        }
+        iniciarJuego();
+    }
+
+    @Override
+    public void setRevancha(int idJugador){
+        // Setea revancha en true en la posicion que le corresponde al jugador
+        revancha[idJugador - 1] = true;
+    }
+
+    @Override
+    public boolean seJuegaRevancha() {
+        // retorna verdadero si ambos aceptaron la revancha
+        return revancha[0] && revancha[1];
     }
 
     @Override
@@ -69,12 +99,80 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
                         darCartasFaltantesJugador(jugador, 1);
                         sePudoJugarUnaCarta = true;
                     }
+                } else {
+                    if(cartaJugada instanceof Tratamiento){
+                        boolean sePudoJugarTratamiento = jugarCarta(jugador, (Tratamiento) cartaJugada);
+                        if(sePudoJugarTratamiento){
+                            darCartasFaltantesJugador(jugador, 1);
+                            sePudoJugarUnaCarta = true;
+                        }
+                    }
                 }
             }
         }
         // Notifico si se pudo jugar la carta en cuestión
         return sePudoJugarUnaCarta;
     }
+
+
+    public boolean jugarCarta(Jugador jugador, Tratamiento tratamiento) throws RemoteException{
+        // Id 1 = error médico
+        if(tratamiento.getId() == 1){
+            Cuerpo cuerpoJugador = jugador.getCuerpoJugador();
+            Cuerpo cuerpoRival = getRival(jugador.getNumeroDeJugador()).getCuerpoJugador();
+
+            jugador.setCuerpoJugador(cuerpoRival);      // Seteo el cuerpo del rival en el jugador
+            getRival(jugador.getNumeroDeJugador()).setCuerpoJugador(cuerpoJugador);  // Seteo el cuerpo del jugador en el rival
+
+            mazoDeDescarte.agregarCarta(tratamiento);
+            jugador.eliminarCartaDeLaMano(tratamiento);
+            return true;
+        }
+
+        // Id 2 = contagio
+        if(tratamiento.getId() == 2){
+            ArrayList<Organo> cuerpoJugador = jugador.getCuerpoJugador().getOrganos();
+            ArrayList<Organo> cuerpoRival = getRival(jugador.getNumeroDeJugador()).getCuerpoJugador().getOrganos();
+
+            boolean sePudoJugarContagio = false;
+            for (Organo organoJugador : cuerpoJugador) {
+                // Primero verifica si algún organo del jugador está infectado
+                if (organoJugador.estaInfectado()) {
+                    for (Organo organoRival : cuerpoRival) {
+                        // Despues verifica que el organo del rival este "libre" y que sea del mismo color que el organo del jugador
+                        if (!organoRival.tieneMedicina() && !organoRival.estaInfectado() && !organoRival.esInmune()
+                                && organoJugador.getColor().equals(organoRival.getColor())) {
+
+                            // Traspasa el virus al organo compatible del rival
+                            organoRival.agregarInfeccion(organoJugador.getInfecciones().get(0));
+                            organoJugador.eliminarInfecciones();
+
+                            sePudoJugarContagio = true;
+                        }
+                    }
+                }
+            }
+
+            if(sePudoJugarContagio){
+                jugador.eliminarCartaDeLaMano(tratamiento);
+                agregarCartaAMazoDeDescartes(tratamiento);
+                return true;
+            }
+        }
+
+        // Id 3 = Guante de latex
+        if(tratamiento.getId() == 3){
+            // Descarta las cartas de la mano del rival y le hace perder su turno.
+            descartarCartaManoJugador(getRival(jugador.getNumeroDeJugador()).getNumeroDeJugador(), new int[] {1,2,3});
+            cambiarTurnoJugador(true);
+
+            jugador.eliminarCartaDeLaMano(tratamiento);
+            agregarCartaAMazoDeDescartes(tratamiento);
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public boolean jugarCarta(Jugador jugador, Organo organo) throws RemoteException {
@@ -156,11 +254,11 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
         Organo organoExtirpado = jugador.getCuerpoJugador().extirparOrgano(organo);
         Virus[] infeccionesExtraidas = organoExtirpado.extraerInfecciones();
         Medicina[] medicinasExtraidas = organoExtirpado.extraerMedicinas();
-        for (int i = 0; i < medicinasExtraidas.length; i++) {
-            mazoDeDescarte.agregarCarta(medicinasExtraidas[i]);
+        for (Medicina medicinaExtraida : medicinasExtraidas) {
+            mazoDeDescarte.agregarCarta(medicinaExtraida);
         }
-        for (int i = 0; i < infeccionesExtraidas.length; i++) {
-            mazoDeDescarte.agregarCarta(infeccionesExtraidas[i]);
+        for (Virus infeccionExtraida : infeccionesExtraidas) {
+            mazoDeDescarte.agregarCarta(infeccionExtraida);
         }
         organoExtirpado.reiniciarOrgano();
         mazoDeDescarte.agregarCarta(organoExtirpado);
@@ -175,15 +273,6 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
         } else {
             return jugadores.get(1);
         }
-    }
-
-    /* Agrego un nuevo jugador */
-    @Override
-    public void agregarJugador(Jugador jugador) throws RemoteException {
-        System.out.println("Agregando jugador: " + jugador.getNombre());
-        dar3CartasJugador(jugador);
-        jugadores.add(jugador);
-        System.out.println(jugador);
     }
 
     @Override
@@ -260,6 +349,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
         }
     }
 
+    // TODO:
     // Eliminar
     /*@Override
     public void notificarCambio(Object objeto){
@@ -274,9 +364,13 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
     }*/
 
 
-    /* Para terminar el turno de un jugador y dárselo al siguiente */
+    /*
+    * Para terminar el turno de un jugador y dárselo al siguiente
+    * boolean accionadoPorCarta, si está en true, es porque se jugó el tratamiento "Guante de latex" que hace perder un turno al rival.
+    * Si está en false, es un cambio de turno normal.
+    */
     @Override
-    public Jugador cambiarTurnoJugador() throws RemoteException {
+    public Jugador cambiarTurnoJugador(boolean accionadoPorCarta) throws RemoteException {
         // Si el turno de jugador está en nulo, se le da el turno al primer jugador. Esto pasa solo al empezar el juego.
         if(turnoJugador == null){
             turnoJugador = jugadores.get(0);
@@ -287,7 +381,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
                 turnoJugador = jugadores.get(0);
             }
             //turnoJugador = jugadores.get(1);
-            notificarObservadores(AccionModelo.INICIO_NUEVO_TURNO);
+            if(!accionadoPorCarta) notificarObservadores(AccionModelo.INICIO_NUEVO_TURNO);
         }
 
 
@@ -295,6 +389,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
     }
 
     // Controlar si algun jugador está en condición de ser ganador
+    // Si no hay ganador, cambia el turno
     @Override
     public void controlarGanador() throws RemoteException {
         for (int i = 0; i < jugadores.size(); i++) {
@@ -312,14 +407,15 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
                     }
                 }
 
+                // TODO: Serializador
                 // Si no tiene ninguna infección, entonces ese jugador es el ganador :)
-                // Descomentar esto luego
                 if(!tieneAlgunaInfeccion){
                     this.ganador = jugadores.get(i);
-                    jugadores.get(i).setGanador();
-                //    String nombreGanador = ganador.getNombre();
-                //    String nombrePerdedor = getRival(ganador).getNombre();
-                //    SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
+
+                    // Guardo quién ganó y quién perdió en la tabla de ganadores
+                    String nombreGanador = ganador.getNombre();
+                    String nombrePerdedor = getRival(ganador.getNumeroDeJugador()).getNombre();
+                    new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
                     if(ganador.getNumeroDeJugador() == 1){
                         notificarObservadores(AccionModelo.GANO_JUGADOR_1);
                     } else {
@@ -329,7 +425,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
             }
         }
         if(ganador == null){
-            cambiarTurnoJugador();
+            cambiarTurnoJugador(false);
         }
     }
 

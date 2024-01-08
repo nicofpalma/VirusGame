@@ -1,10 +1,11 @@
 package virus.game.utils;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class SerializadorDeGanadores {
-    private static final Serializador serializador = new Serializador("tablas.dat");
+    private static final Serializador serializador = new Serializador("tablasGanadores.dat");
 
     public SerializadorDeGanadores(String nombreGanador, String nombrePerdedor){
         // Simplemente guarda algunos datos sobre el ganador
@@ -14,7 +15,15 @@ public class SerializadorDeGanadores {
         String fechaFormateada = fechaHoraActual.format(formato);
 
         String datosAGuardar = nombreGanador + " le ganó a " + nombrePerdedor + " con fecha y hora: " + fechaFormateada;
-        serializador.addOneObject(datosAGuardar);
+
+        File archivo = new File("tablasGanadores.dat");
+        if(archivo.exists() && !archivo.isDirectory()){
+            // Agrega una nueva línea si ya existía
+            serializador.addOneObject(datosAGuardar);
+        } else {
+            // Escribe el archivo de 0 si no existía
+            serializador.writeOneObject(datosAGuardar);
+        }
     }
 
     public SerializadorDeGanadores(){
@@ -23,14 +32,18 @@ public class SerializadorDeGanadores {
 
     public String generarStringDeGanadores(){
         Object[] registros = serializador.readObjects();
-        String registrosString = "";
-        for (int i = 0; i < registros.length; i++) {
-            registrosString += registros[i].toString() + "\n";
-        }
-        if(registrosString.equals("")){
-            registrosString = "No hay partidas jugadas todavía.";
+        StringBuilder registrosString = new StringBuilder();
+
+        for (int i = registros.length - 1; i >= 0; i--) {
+            registrosString.append(registros[i].toString()).append("\n");
+            registrosString.append("-----------------------------------------------------------------------------------\n");
         }
 
-        return registrosString;
+        if(registrosString.isEmpty()){
+            registrosString = new StringBuilder("No hay partidas jugadas todavía.");
+        }
+
+        return registrosString.toString();
     }
+
 }

@@ -5,9 +5,11 @@ import ar.edu.unlu.rmimvc.Util;
 import ar.edu.unlu.rmimvc.cliente.Cliente;
 import virus.game.controladores.Controlador;
 import virus.game.vistas.IVista;
+import virus.game.vistas.consola.VistaConsola;
 import virus.game.vistas.grafica.VistaGrafica;
 
 import javax.swing.*;
+import java.lang.reflect.Array;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -46,9 +48,27 @@ public class AppCliente {
                 null,
                 8888
         );
+        ArrayList<String> vistas = new ArrayList<>(2);
+        vistas.add("Vista gráfica");
+        vistas.add("Vista consola");
+
+        String tipoDeVista = (String) JOptionPane.showInputDialog(
+                null,
+                "Seleccione la vista con la que desea jugar", "Tipo de vista",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                vistas.toArray(),
+                vistas.get(0)
+        );
 
         SwingUtilities.invokeLater(()-> {
-            IVista vista = new VistaGrafica();
+            IVista vista;
+            if(tipoDeVista.equals("Vista gráfica")){
+                // Tomo la vista gráfica si la elegió, si no la de consola.
+                vista = new VistaGrafica();
+            } else {
+                vista = new VistaConsola();
+            }
             Controlador controlador = new Controlador(vista);
             vista.setControlador(controlador);
             Cliente c = new Cliente(ip, Integer.parseInt(port), ipServidor, Integer.parseInt(portServidor));
@@ -61,8 +81,6 @@ public class AppCliente {
                 throw new RuntimeException(e);
             }
         });
-        // vista.mostrarMenuPrincipal();
-
     }
 }
 
