@@ -4,7 +4,9 @@ import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import virus.game.modelos.*;
 import virus.game.modelos.cartas.Organo;
+import virus.game.utils.Serializador;
 import virus.game.utils.SerializadorDeGanadores;
+import virus.game.utils.SerializadorPartida;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
@@ -16,11 +18,10 @@ import java.util.ArrayList;
 public class Controlador implements IControladorRemoto, Serializable {
     @Serial
     private static final long serialVersionUID = -5490212082421746916L;
-    IModelo modelo;  // Corroborar si tiene que ser private o no
-    IVista vista;   // Corroborar si tiene que ser private o no
+    private IModelo modelo;
+    private IVista vista;
     private int idJugador = -1;  // Inicializo en -1 para controlar cuando todavía no existe el jugador del controlador
     private int idRival = -2;   // Inicializo en -2 para controlar cuando todavía no existe un rival
-    private AccionModelo accionModelo;
 
     public Controlador(IVista vista){
         this.vista = vista;
@@ -146,43 +147,6 @@ public class Controlador implements IControladorRemoto, Serializable {
         return getCuerpoRival().toString();
     }
 
-    /* Antigua implementación
-    @Override
-    public void actualizar(Object accion) {
-        if(accion instanceof AccionModelo){
-            switch ((AccionModelo) accion){
-                case INICIAR_JUEGO:
-                {
-                    avisarCambioDeTurno();
-                    vista.mostrarMesa();
-                    break;
-                }
-                case ESPERAR_REGISTRO:{
-                    if(this.jugador != null){
-                        vista.avisarEsperaALosDemasJugadores();
-                    }
-                    break;
-                }
-                case INICIO_NUEVO_TURNO:{
-                    vista.mostrarMesa();
-                    avisarCambioDeTurno();
-                    break;
-                }
-                case GAME_OVER:{
-                    Jugador jugadorGanador = modelo.getGanador();
-                    vista.mostrarMesa();
-                    if(jugadorGanador.equals(this.jugador)){
-                        vista.avisarQueElJugadorGano();
-                    } else {
-                        vista.avisarQueElJugadorPerdio();
-                    }
-                    vista.setAccionVista(AccionVista.GAME_OVER);
-                    break;
-                }
-            }
-        }
-    }*/
-
     public Jugador getTurnoJugador(){
         try {
             return modelo.getTurnoJugador();
@@ -240,6 +204,24 @@ public class Controlador implements IControladorRemoto, Serializable {
         }
     }
 
+    public boolean hayPartidaGuardada(){
+        try {
+            return new SerializadorPartida().hayPartidaGuardada();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String nombreJugadoresEnPartidaGuardada(){
+        try {
+            return new SerializadorPartida().nombreJugadores();
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     public String buscarTablaDeGanadores(){
         SerializadorDeGanadores serializadorDeGanadores = new SerializadorDeGanadores();
         return serializadorDeGanadores.generarStringDeGanadores();
@@ -254,6 +236,28 @@ public class Controlador implements IControladorRemoto, Serializable {
         } catch (RemoteException e){
             e.printStackTrace();
         }
+    }
+
+    public boolean cargarPartidaGuardada(){
+        boolean sePudocargar = false;
+        try {
+            // Carga la partida solo una vez. Coloca los ids, para el jugador y para el rival.
+            if(!modelo.seCargoLaPartida()){
+                // Controla que se pueda cargar la partida (si es que existe para cargar)
+                sePudocargar = modelo.cargarPartida();
+
+                if(sePudocargar) idJugador = modelo.getJugadores().get(0).getNumeroDeJugador();
+            } else {
+                idJugador = modelo.getJugadores().get(1).getNumeroDeJugador();
+            }
+            idRival = modelo.getRival(idJugador).getNumeroDeJugador();
+            avisarCambioDeTurno();
+            
+            sePudocargar = true;
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
+        return sePudocargar;
     }
 
     @Override

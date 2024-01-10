@@ -74,6 +74,12 @@ public interface IModelo extends IObservableRemoto {
     // Controlar si algun jugador está en condición de ser ganador
     void controlarGanador() throws RemoteException;
 
+    boolean seCargoLaPartida()  throws RemoteException;
+
+    boolean cargarPartida() throws RemoteException;
+
+    void guardarPartida() throws RemoteException;
+
     int cantidadDeCartasEnMazo() throws RemoteException;
 
     int cantidadDeCartasEnMazoDeDescartes() throws RemoteException;

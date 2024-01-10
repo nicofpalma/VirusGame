@@ -72,8 +72,28 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         panelIngresoNombre.add(campoNombre);
         panelIngresoNombre.add(botonConfirmar);
 
-        JLabel labelEspacio = new JLabel("                                                                            ");
+        JLabel labelEspacio = new JLabel("                                  ");
         panelIngresoNombre.add(labelEspacio);
+
+        JButton botonCargarPartida = new JButton("Cargar partida");
+        panelIngresoNombre.add(botonCargarPartida);
+        botonCargarPartida.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        null,
+                        "¿Desea reanudar la partida de " + controlador.nombreJugadoresEnPartidaGuardada() + "?", "Reanudar partida",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if(respuesta == JOptionPane.YES_OPTION){
+                    System.out.println("entre a yes_opt");
+                    controlador.cargarPartidaGuardada();
+                    mostrarMesa();
+                }
+            }
+        });
 
         JButton botonReglas = new JButton("Ver reglas");
         panelIngresoNombre.add(botonReglas);

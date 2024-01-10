@@ -6,6 +6,7 @@ import virus.game.modelos.cartas.Organo;
 import virus.game.modelos.cartas.Tratamiento;
 import virus.game.modelos.cartas.Virus;
 import virus.game.utils.SerializadorDeGanadores;
+import virus.game.utils.SerializadorPartida;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
     private Jugador ganador;
     private Jugador turnoJugador;
     private boolean[] revancha = new boolean[2];
+    private boolean partidaCargada;
 
     public Modelo(){
         this.jugadores = new ArrayList<Jugador>();
@@ -425,8 +427,38 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
             }
         }
         if(ganador == null){
+            guardarPartida();
             cambiarTurnoJugador(false);
         }
+    }
+
+    @Override
+    public boolean seCargoLaPartida() throws RemoteException{
+        return partidaCargada;
+    }
+
+    @Override
+    public boolean cargarPartida() throws RemoteException{
+        // Retorna verdadero si se pudo cargar la partida, falso si no existe.
+        if(!partidaCargada){
+            SerializadorPartida serializador = new SerializadorPartida();
+            if(serializador.hayPartidaGuardada()){
+                Modelo modeloCargado = (Modelo) serializador.cargarPartidaGuardada();
+                this.mazo = modeloCargado.getMazo();
+                this.mazoDeDescarte = modeloCargado.getMazoDeDescarte();
+                this.jugadores = modeloCargado.getJugadores();
+                this.turnoJugador = modeloCargado.getTurnoJugador();
+                partidaCargada = true;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public void guardarPartida() throws RemoteException {
+        new SerializadorPartida(this);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class Serializador {
             }
             ois.close();
         } catch (EOFException e ){
-            System.out.println("Lectura de tablas completada");
+            System.out.println("Lectura de " + nombreArchivo + " completado");
         } catch (ClassNotFoundException | IOException e ){
             e.printStackTrace();
         }
