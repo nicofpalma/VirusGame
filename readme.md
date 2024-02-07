@@ -1,7 +1,5 @@
 # Virus! El juego de cartas más contagioso.
 
-<hr>
-
 ## Descripción
 
 - Videojuego de cartas realizado en Java, utilizando el patrón MVC, Observer y RMI.
@@ -86,10 +84,10 @@ cuerpo dos órganos iguales en ningún momento.
 
 | Nombre       | Imágen                                                                                                                                     | Cantidad |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| **Cerebro**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/cerebro.png" alt="Cerebro" width="50%" height="100%"></div>   | **5**    |
-| **Corazón**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/corazon.png" alt="Corazon" width="50%" height="100%"></div>   | **5**    |
-| **Estómago** | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/estomago.png" alt="Estomago" width="50%" height="100%"></div> | **5**    |
-| **Hueso**    | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/hueso.png" alt="Hueso" width="50%" height="100%"></div>       | **5**    |
+| **Cerebro**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/cerebro.png" alt="Cerebro" width="50%" height="100%"></div>   | **5**    |
+| **Corazón**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/corazon.png" alt="Corazon" width="50%" height="100%"></div>   | **5**    |
+| **Estómago** | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/estomago.png" alt="Estomago" width="50%" height="100%"></div> | **5**    |
+| **Hueso**    | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/hueso.png" alt="Hueso" width="50%" height="100%"></div>       | **5**    |
 
 ### Cartas de virus (16 en total)
 
@@ -99,10 +97,10 @@ Los virus sólo tienen efecto sobre órganos y medicinas de su mismo color.
 
 | Nombre                 | Imágen                                                                                                                                               | Cantidad |
 |------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| **Virus del Cerebro**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/virusCerebro.png" alt="virusCerebro" width="50%" height="100%"></div>   | **4**    |
-| **Virus del Corazón**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/virusCorazon.png" alt="virusCorazon" width="50%" height="100%"></div>   | **4**    |
-| **Virus del Estómago** | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/virusEstomago.png" alt="virusEstomago" width="50%" height="100%"></div> | **4**    |
-| **Virus del Hueso**    | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/virusHueso.png" alt="virusHueso" width="50%" height="100%"></div>       | **4**    |
+| **Virus del Cerebro**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/virusCerebro.png" alt="virusCerebro" width="50%" height="100%"></div>   | **4**    |
+| **Virus del Corazón**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/virusCorazon.png" alt="virusCorazon" width="50%" height="100%"></div>   | **4**    |
+| **Virus del Estómago** | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/virusEstomago.png" alt="virusEstomago" width="50%" height="100%"></div> | **4**    |
+| **Virus del Hueso**    | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/virusHueso.png" alt="virusHueso" width="50%" height="100%"></div>       | **4**    |
 
 ### Cartas de medicinas (16 en total)
 
@@ -114,10 +112,10 @@ las cartas de medicina sólo sobre cartas (virus u órganos) de su mismo color.
 
 | Nombre                    | Imágen                                                                                                                                                     | Cantidad |
 |---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| **Medicina del Cerebro**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/medicinaCerebro.png" alt="medicinaCerebro" width="50%" height="100%"></div>   | **4**    |
-| **Medicina del Corazón**  | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/medicinaCorazon.png" alt="medicinaCorazon" width="50%" height="100%"></div>   | **4**    |
-| **Medicina del Estómago** | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/medicinaEstomago.png" alt="medicinaEstomago" width="50%" height="100%"></div> | **4**    |
-| **Medicina del Hueso**    | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/medicinaHueso.png" alt="medicinaHueso" width="50%" height="100%"></div>       | **4**    |
+| **Medicina del Cerebro**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/medicinaCerebro.png" alt="medicinaCerebro" width="50%" height="100%"></div>   | **4**    |
+| **Medicina del Corazón**  | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/medicinaCorazon.png" alt="medicinaCorazon" width="50%" height="100%"></div>   | **4**    |
+| **Medicina del Estómago** | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/medicinaEstomago.png" alt="medicinaEstomago" width="50%" height="100%"></div> | **4**    |
+| **Medicina del Hueso**    | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/medicinaHueso.png" alt="medicinaHueso" width="50%" height="100%"></div>       | **4**    |
 
 ### Cartas de tratamientos (4 en total)
 
@@ -127,9 +125,9 @@ que tú. Estas cartas se juegan sobre la pila de descartes y tienen efecto inmed
 
 | Nombre                 | Imágen                                                                                                                                               | Cantidad | Descripcion                                                                                                            |
 |------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|----------|------------------------------------------------------------------------------------------------------------------------|
-| **Guante de Látex**    | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/guanteDeLatex.png" alt="guanteDeLatex" width="50%" height="100%"></div> | **1**    | Descarta la mano de tu rival y le obliga a robar 3 cartas nuevas. Puedes realizar otra acción extra este turno.        |
-| **Error médico**       | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/errorMedico.png" alt="errorMedico" width="50%" height="100%"></div>     | **1**    | Intercambia todo tu cuerpo por el del rival, incluyendo órganos, virus y vacunas. También intercambia órganos inmunes. |
-| **Contagio**           | <div style="text-align: center;"><img src="src/virus/game/modelos/cartas/img/contagio.png" alt="contagio" width="50%" height="100%"></div>           | **2**    | Traslada todos los virus que tengan tus órganos infectados a los órganos del rival.                                    |
+| **Guante de Látex**    | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/guanteDeLatex.png" alt="guanteDeLatex" width="50%" height="100%"></div> | **1**    | Descarta la mano de tu rival y le obliga a robar 3 cartas nuevas. Puedes realizar otra acción extra este turno.        |
+| **Error médico**       | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/errorMedico.png" alt="errorMedico" width="50%" height="100%"></div>     | **1**    | Intercambia todo tu cuerpo por el del rival, incluyendo órganos, virus y vacunas. También intercambia órganos inmunes. |
+| **Contagio**           | <div style="text-align: center;"><img src="virusGame/src/virus/game/modelos/cartas/img/contagio.png" alt="contagio" width="50%" height="100%"></div>           | **2**    | Traslada todos los virus que tengan tus órganos infectados a los órganos del rival.                                    |
 
 <hr>
 
