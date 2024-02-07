@@ -1,7 +1,5 @@
 # Virus! El juego de cartas más contagioso.
 
-<hr>
-
 ## Descripción
 
 - Videojuego de cartas realizado en Java, utilizando el patrón MVC, Observer y RMI.
