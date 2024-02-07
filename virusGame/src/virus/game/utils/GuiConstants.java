@@ -5,7 +5,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 // Esta clase solo contiene constantes usadas en la vista gráfica
-public class Const implements Serializable {
+public class GuiConstants implements Serializable {
     @Serial
     private static final long serialVersionUID = 3916841880017339074L;
     public static final int ANCHO_VENTANA = 800;

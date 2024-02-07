@@ -3,7 +3,7 @@ package virus.game.vistas.grafica;
 import virus.game.controladores.Controlador;
 import virus.game.modelos.Carta;
 import virus.game.modelos.cartas.Organo;
-import virus.game.utils.Const;
+import virus.game.utils.GuiConstants;
 import virus.game.vistas.AccionVista;
 import virus.game.vistas.IVista;
 
@@ -52,7 +52,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
     public VistaGrafica() {
         setTitle("Virus - El juego de cartas más contagioso");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
+        setSize(GuiConstants.ANCHO_VENTANA, GuiConstants.ALTO_VENTANA);
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);
@@ -60,7 +60,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Colores del tooltip, texto que se muestra al poner el mouse arriba de una carta por ejemplo
         UIManager.put("ToolTip.background", Color.BLACK);
         UIManager.put("ToolTip.foreground", Color.WHITE);
-        Border border = BorderFactory.createLineBorder(Const.COLOR_VIOLETA); // Borde violeta del tooltip
+        Border border = BorderFactory.createLineBorder(GuiConstants.COLOR_VIOLETA); // Borde violeta del tooltip
         UIManager.put("ToolTip.border", border);
 
         campoNombre = new JTextField();
@@ -81,17 +81,21 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int respuesta = JOptionPane.showConfirmDialog(
-                        null,
-                        "¿Desea reanudar la partida de " + controlador.nombreJugadoresEnPartidaGuardada() + "?", "Reanudar partida",
-                        JOptionPane.YES_NO_OPTION
-                );
+                if(controlador.hayPartidaGuardada()){
+                    int respuesta = JOptionPane.showConfirmDialog(
+                            null,
+                            "¿Desea reanudar la partida de " + controlador.nombreJugadoresEnPartidaGuardada() + "?", "Reanudar partida",
+                            JOptionPane.YES_NO_OPTION
+                    );
 
-                if(respuesta == JOptionPane.YES_OPTION){
-                    System.out.println("entre a yes_opt");
-                    controlador.cargarPartidaGuardada();
-                    mostrarMesa();
+                    if(respuesta == JOptionPane.YES_OPTION){
+                        controlador.cargarPartidaGuardada();
+                        mostrarMesa();
+                    }
+                } else {
+                    textoBienvenida.append("No hay ninguna partida para reanudar.\n");
                 }
+
             }
         });
 
@@ -143,7 +147,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         if(panelManoJugador == null){
             // Crea el panel de las cartas del jugador (la mano), sólo cuando no está creado todavía
             panelManoJugador = new JPanel();
-            panelManoJugador.setSize(Const.SIZE_MANO_JUGADOR_X, Const.SIZE_MANO_JUGADOR_Y);
+            panelManoJugador.setSize(GuiConstants.SIZE_MANO_JUGADOR_X, GuiConstants.SIZE_MANO_JUGADOR_Y);
             panelManoJugador.setVisible(true);
             panelManoJugador.setOpaque(false);
 
@@ -153,7 +157,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             panelManoJugador.removeAll();
         }
 
-        panelManoJugador.setLocation(Const.LOC_MANO_JUGADOR_X, Const.LOC_MANO_JUGADOR_Y);
+        panelManoJugador.setLocation(GuiConstants.LOC_MANO_JUGADOR_X, GuiConstants.LOC_MANO_JUGADOR_Y);
         // Recorro la mano del jugador, y por cada carta, obtengo su imagen y la agrego al panel de la mano para mostrarlas
         ArrayList<Carta> mano = controlador.getManoJugador();
 
@@ -193,7 +197,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                 }
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    int espacio = Const.ESPACIO_BORDE_SELECCION_CARTA;
+                    int espacio = GuiConstants.ESPACIO_BORDE_SELECCION_CARTA;
                     switch (accionVista){
                         case ESPERAR_TURNO:{
                             mostrarTextoInformativo("No es tu turno, espera...");
@@ -278,7 +282,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
     public void mostrarTextoInformativo(String texto){
         if(panelTextoInformativo == null){
             panelTextoInformativo = new JPanel();
-            panelTextoInformativo.setSize(Const.SIZE_TEXTO_INFORMATIVO_X, Const.SIZE_TEXTO_INFORMATIVO_Y);
+            panelTextoInformativo.setSize(GuiConstants.SIZE_TEXTO_INFORMATIVO_X, GuiConstants.SIZE_TEXTO_INFORMATIVO_Y);
             panelTextoInformativo.setVisible(true);
             panelTextoInformativo.setOpaque(false);
             capas.add(panelTextoInformativo, JLayeredPane.POPUP_LAYER);
@@ -290,14 +294,13 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         labelTexto.setForeground(Color.white);
 
         panelTextoInformativo.add(labelTexto, BorderLayout.CENTER);
-        panelTextoInformativo.setLocation(Const.LOC_TEXTO_INFORMATIVO_X, Const.LOC_TEXTO_INFORMATIVO_Y);
+        panelTextoInformativo.setLocation(GuiConstants.LOC_TEXTO_INFORMATIVO_X, GuiConstants.LOC_TEXTO_INFORMATIVO_Y);
         panelTextoInformativo.revalidate();
         panelTextoInformativo.repaint();
     }
 
     @Override
     public void mostrarBienvenida(){
-        System.out.println("Entré a mostrar bienvenida");
         textoBienvenida = new JTextArea("¡Bienvenido a Virus, el juego de cartas más contagioso!\n Ingresa tu nombre en el input debajo: \n");
         textoBienvenida.setBackground(Color.BLACK);
         textoBienvenida.setForeground(Color.WHITE);
@@ -345,10 +348,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         if(!organosCuerpoRival.isEmpty()){
             if(panelCuerpoRival == null){
                 panelCuerpoRival = new JPanel();
-                panelCuerpoRival.setSize(Const.SIZE_PANEL_CUERPO_X, Const.SIZE_PANEL_CUERPO_Y);
+                panelCuerpoRival.setSize(GuiConstants.SIZE_PANEL_CUERPO_X, GuiConstants.SIZE_PANEL_CUERPO_Y);
                 panelCuerpoRival.setVisible(true);
                 panelCuerpoRival.setOpaque(false);
-                panelCuerpoRival.setLocation(Const.LOC_PANEL_CUERPO_X, Const.LOC_PANEL_CUERPO_RIVAL_Y);
+                panelCuerpoRival.setLocation(GuiConstants.LOC_PANEL_CUERPO_X, GuiConstants.LOC_PANEL_CUERPO_RIVAL_Y);
                 capas.add(panelCuerpoRival, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelCuerpoRival.removeAll();
@@ -370,7 +373,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                 if(organo.estaInfectado()){
                     Image imagenInfeccion = organo.getInfecciones().get(0).getImagen()
                             .getImage()
-                            .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                            .getScaledInstance(GuiConstants.SIZE_IMG_INFECCION_MEDICINA_X, GuiConstants.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
 
                     JLabel labelInfeccion = new JLabel(new ImageIcon(imagenInfeccion));
                     labelInfeccion.setVisible(true);
@@ -387,7 +390,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
 
                         Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                 .getImage()
-                                .getScaledInstance(Const.SIZE_IMGS_INMUNE_X, Const.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
+                                .getScaledInstance(GuiConstants.SIZE_IMGS_INMUNE_X, GuiConstants.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
 
                         JLabel labelMedicina1 = new JLabel(new ImageIcon(imagenMedicina));
                         JLabel labelMedicina2 = new JLabel(new ImageIcon(imagenMedicina));
@@ -403,7 +406,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                         if(organo.tieneMedicina()){
                             Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                     .getImage()
-                                    .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                                    .getScaledInstance(GuiConstants.SIZE_IMG_INFECCION_MEDICINA_X, GuiConstants.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
                             JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
                             labelMedicina.setVisible(true);
                             labelMedicina.setOpaque(false);
@@ -427,10 +430,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             if(panelCuerpoJugador == null){
                 // Creo el panel del cuerpo del jugador si no estaba creado anteriormente
                 panelCuerpoJugador = new JPanel();
-                panelCuerpoJugador.setSize(Const.SIZE_PANEL_CUERPO_X, Const.SIZE_PANEL_CUERPO_Y);
+                panelCuerpoJugador.setSize(GuiConstants.SIZE_PANEL_CUERPO_X, GuiConstants.SIZE_PANEL_CUERPO_Y);
                 panelCuerpoJugador.setVisible(true);
                 panelCuerpoJugador.setOpaque(false);
-                panelCuerpoJugador.setLocation(Const.LOC_PANEL_CUERPO_X, Const.LOC_PANEL_CUERPO_JUGADOR_Y);
+                panelCuerpoJugador.setLocation(GuiConstants.LOC_PANEL_CUERPO_X, GuiConstants.LOC_PANEL_CUERPO_JUGADOR_Y);
                 capas.add(panelCuerpoJugador, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelCuerpoJugador.removeAll();
@@ -455,7 +458,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                 if(organo.estaInfectado()) {
                     Image imagenInfeccion = organo.getInfecciones().get(0).getImagen().
                             getImage().
-                            getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                            getScaledInstance(GuiConstants.SIZE_IMG_INFECCION_MEDICINA_X, GuiConstants.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
 
                     JLabel labelInfeccion = new JLabel(new ImageIcon(imagenInfeccion));
                     labelInfeccion.setVisible(true);
@@ -472,7 +475,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
 
                         Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                 .getImage()
-                                .getScaledInstance(Const.SIZE_IMGS_INMUNE_X, Const.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
+                                .getScaledInstance(GuiConstants.SIZE_IMGS_INMUNE_X, GuiConstants.SIZE_IMGS_INMUNE_Y, Image.SCALE_SMOOTH);
 
                         JLabel labelMedicina1 = new JLabel(new ImageIcon(imagenMedicina));
                         JLabel labelMedicina2 = new JLabel(new ImageIcon(imagenMedicina));
@@ -489,7 +492,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
                             // Agrego la carta de medicina sobre la carta del organo
                             Image imagenMedicina = organo.getMedicinas().get(0).getImagen()
                                     .getImage()
-                                    .getScaledInstance(Const.SIZE_IMG_INFECCION_MEDICINA_X, Const.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
+                                    .getScaledInstance(GuiConstants.SIZE_IMG_INFECCION_MEDICINA_X, GuiConstants.SIZE_IMG_INFECCION_MEDICINA_Y, Image.SCALE_SMOOTH);
                             JLabel labelMedicina = new JLabel(new ImageIcon(imagenMedicina));
                             labelMedicina.setVisible(true);
                             labelMedicina.setOpaque(false);
@@ -549,7 +552,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
     public void iniciarVistaYControlarEventos(){
         // Agrego capas para poder manejar varios elementos simultaneos
         capas = new JLayeredPane();
-        capas.setSize(Const.ANCHO_VENTANA, Const.ALTO_VENTANA);
+        capas.setSize(GuiConstants.ANCHO_VENTANA, GuiConstants.ALTO_VENTANA);
 
         // Agrego una imágen de fondo
         ImageIcon background = new ImageIcon("./src/virus/game/modelos/cartas/img/fondo3.jpg");
@@ -563,35 +566,35 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Creacion de los botones para jugar
         botonDescartar = new JButton();
         botonDescartar.setText("Descartar");
-        botonDescartar.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
+        botonDescartar.setSize(GuiConstants.SIZE_BTN_X, GuiConstants.SIZE_BTN_Y);
         botonDescartar.setVisible(false);
-        botonDescartar.setLocation(Const.LOC_BTN_DESCARTAR_X, Const.LOC_BTN_Y);
+        botonDescartar.setLocation(GuiConstants.LOC_BTN_DESCARTAR_X, GuiConstants.LOC_BTN_Y);
         botonDescartar.setBackground(Color.WHITE);
         botonDescartar.setForeground(Color.BLACK);
 
         botonCancelarDescarte = new JButton();
         botonCancelarDescarte.setText("Cancelar");
-        botonCancelarDescarte.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
+        botonCancelarDescarte.setSize(GuiConstants.SIZE_BTN_X, GuiConstants.SIZE_BTN_Y);
         botonCancelarDescarte.setVisible(false);
-        botonCancelarDescarte.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        botonCancelarDescarte.setLocation(GuiConstants.LOC_BTN_DERECHA_X, GuiConstants.LOC_BTN_Y);
         botonCancelarDescarte.setBackground(Color.WHITE);
         botonCancelarDescarte.setForeground(Color.BLACK);
 
         // Muestra el nombre del jugador y del rival
         textoNombreJugador = new JLabel(controlador.getJugador().getNombre());
         textoNombreJugador.setForeground(Color.WHITE);
-        textoNombreJugador.setSize(Const.SIZE_NOMBRE_JUGADOR_X, Const.SIZE_NOMBRE_JUGADOR_Y);
+        textoNombreJugador.setSize(GuiConstants.SIZE_NOMBRE_JUGADOR_X, GuiConstants.SIZE_NOMBRE_JUGADOR_Y);
         textoNombreJugador.setOpaque(false);
-        textoNombreJugador.setLocation(Const.LOC_NOMBRE_JUGADOR_X, Const.LOC_NOMBRE_JUGADOR_Y);
+        textoNombreJugador.setLocation(GuiConstants.LOC_NOMBRE_JUGADOR_X, GuiConstants.LOC_NOMBRE_JUGADOR_Y);
         textoNombreJugador.setVisible(true);
         textoNombreJugador.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
         textoNombreJugador.setToolTipText("Tú");
 
         textoNombreRival = new JLabel(controlador.getRival().getNombre());
         textoNombreRival.setForeground(Color.WHITE);
-        textoNombreRival.setSize(Const.SIZE_NOMBRE_JUGADOR_X, Const.SIZE_NOMBRE_JUGADOR_Y);
+        textoNombreRival.setSize(GuiConstants.SIZE_NOMBRE_JUGADOR_X, GuiConstants.SIZE_NOMBRE_JUGADOR_Y);
         textoNombreRival.setOpaque(false);
-        textoNombreRival.setLocation(Const.LOC_NOMBRE_JUGADOR_X, Const.LOC_NOMBRE_RIVAL_Y);
+        textoNombreRival.setLocation(GuiConstants.LOC_NOMBRE_JUGADOR_X, GuiConstants.LOC_NOMBRE_RIVAL_Y);
         textoNombreRival.setVisible(true);
         textoNombreRival.setFont(new Font(getFont().getName(), Font.BOLD, getFont().getSize()));
         textoNombreRival.setToolTipText("Rival");
@@ -650,14 +653,14 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             botonDescartar.setText("Descartar");
             setAccionVista(AccionVista.TURNO_JUGADOR);
             botonCancelarDescarte.setVisible(false);
-            mostrarTextoInformativo(Const.TXT_JUEGA_UNA_CARTA);
+            mostrarTextoInformativo(GuiConstants.TXT_JUEGA_UNA_CARTA);
         });
 
         botonJugar = new JButton();
         botonJugar.setText("Jugar");
-        botonJugar.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
+        botonJugar.setSize(GuiConstants.SIZE_BTN_X, GuiConstants.SIZE_BTN_Y);
         botonJugar.setVisible(false);
-        botonJugar.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        botonJugar.setLocation(GuiConstants.LOC_BTN_DERECHA_X, GuiConstants.LOC_BTN_Y);
         botonJugar.setBackground(Color.WHITE);
         botonJugar.setForeground(Color.BLACK);
 
@@ -689,10 +692,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Si el panel del mazo todavía no se creó, se crea aquí por primera vez
         if(panelMazo == null){
             panelMazo = new JPanel();
-            panelMazo.setSize(Const.SIZE_MAZO_X, Const.SIZE_MAZO_Y);
+            panelMazo.setSize(GuiConstants.SIZE_MAZO_X, GuiConstants.SIZE_MAZO_Y);
             panelMazo.setOpaque(false);
             panelMazo.setVisible(true);
-            panelMazo.setLocation(Const.LOC_MAZO_X ,Const.LOC_MAZO_Y);
+            panelMazo.setLocation(GuiConstants.LOC_MAZO_X , GuiConstants.LOC_MAZO_Y);
             capas.add(panelMazo, JLayeredPane.PALETTE_LAYER);
         } else {
             panelMazo.removeAll();
@@ -720,7 +723,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Obtengo la imágen del dorso de las cartas
         Image imagenDorso = new ImageIcon("./src/virus/game/modelos/cartas/img/dorso.png")
                 .getImage()
-                .getScaledInstance(Const.SIZE_IMG_MAZO_X, Const.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
+                .getScaledInstance(GuiConstants.SIZE_IMG_MAZO_X, GuiConstants.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
 
         if(cantidadDeCartasEnMazo == 1) cantidadDeCartasEnMazo = 2; // Para que se muestre cuando queda solo 1 carta
         for (int i = (cantidadDeCartasEnMazo / 2) - 1; i >= 0; i--) {
@@ -758,10 +761,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         if(!cartasDelMazoDeDescartes.isEmpty()) {
             if(panelMazoDeDescartes == null){
                 panelMazoDeDescartes = new JPanel();
-                panelMazoDeDescartes.setSize(Const.SIZE_MAZO_X, Const.SIZE_MAZO_DESCARTES_Y);
+                panelMazoDeDescartes.setSize(GuiConstants.SIZE_MAZO_X, GuiConstants.SIZE_MAZO_DESCARTES_Y);
                 panelMazoDeDescartes.setVisible(true);
                 panelMazoDeDescartes.setOpaque(false);
-                panelMazoDeDescartes.setLocation(Const.LOC_MAZO_X, Const.LOC_MAZO_DESCARTES_Y);
+                panelMazoDeDescartes.setLocation(GuiConstants.LOC_MAZO_X, GuiConstants.LOC_MAZO_DESCARTES_Y);
                 capas.add(panelMazoDeDescartes, JLayeredPane.PALETTE_LAYER);
             } else {
                 panelMazoDeDescartes.removeAll();
@@ -781,7 +784,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             for (int i = cantidadDeCartas - 1; i >= cantCartasAMostrar; i--) {
                 Image imagenCarta = cartasDelMazoDeDescartes.get(i).getImagen()
                         .getImage()
-                        .getScaledInstance(Const.SIZE_IMG_MAZO_X, Const.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
+                        .getScaledInstance(GuiConstants.SIZE_IMG_MAZO_X, GuiConstants.SIZE_IMG_MAZO_Y, Image.SCALE_SMOOTH);
                 JLabel labelCarta = new JLabel(new ImageIcon(imagenCarta));
 
                 //labelCarta.setToolTipText(cartasDelMazoDeDescartes.get(i).toString() + " (Descartada)");
@@ -806,10 +809,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // También, al final avisa quién es el ganador
         if(panelTextoTurno == null){
             panelTextoTurno = new JPanel();
-            panelTextoTurno.setSize(Const.SIZE_TEXTO_TURNO_X, Const.SIZE_TEXTO_TURNO_Y);
+            panelTextoTurno.setSize(GuiConstants.SIZE_TEXTO_TURNO_X, GuiConstants.SIZE_TEXTO_TURNO_Y);
             panelTextoTurno.setVisible(true);
             panelTextoTurno.setOpaque(false);
-            panelTextoTurno.setLocation(Const.LOC_TEXTO_TURNO_X, Const.LOC_TEXTO_TURNO_Y);
+            panelTextoTurno.setLocation(GuiConstants.LOC_TEXTO_TURNO_X, GuiConstants.LOC_TEXTO_TURNO_Y);
             textoTurno = new JLabel();
             textoTurno.setForeground(Color.white);
             panelTextoTurno.add(textoTurno);
@@ -818,10 +821,10 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
 
         if(controlador.esSuTurno()){
             textoTurno.setText("*** TU TURNO ***");
-            mostrarTextoInformativo(Const.TXT_JUEGA_UNA_CARTA);
+            mostrarTextoInformativo(GuiConstants.TXT_JUEGA_UNA_CARTA);
         } else {
             textoTurno.setText("*** TURNO DE " + controlador.getTurnoJugador().getNombre() + " ***");
-            mostrarTextoInformativo(Const.TXT_ESPERA_QUE_EL_RIVAL_JUEGUE);
+            mostrarTextoInformativo(GuiConstants.TXT_ESPERA_QUE_EL_RIVAL_JUEGUE);
         }
     }
 
@@ -833,7 +836,7 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
             botonJugar.setVisible(false);
         } else {
             //mostrarMesa();
-            mostrarTextoInformativo(Const.TXT_NO_PUEDES_JUGAR_CARTA);
+            mostrarTextoInformativo(GuiConstants.TXT_NO_PUEDES_JUGAR_CARTA);
         }
     }
 
@@ -865,8 +868,8 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Botón salir
         JButton botonSalir = new JButton("Salir");
         botonSalir.setVisible(true);
-        botonSalir.setSize(Const.SIZE_BTN_X, Const.SIZE_BTN_Y);
-        botonSalir.setLocation(Const.LOC_BTN_DESCARTAR_X, Const.LOC_BTN_Y);
+        botonSalir.setSize(GuiConstants.SIZE_BTN_X, GuiConstants.SIZE_BTN_Y);
+        botonSalir.setLocation(GuiConstants.LOC_BTN_DESCARTAR_X, GuiConstants.LOC_BTN_Y);
         capas.add(botonSalir, JLayeredPane.POPUP_LAYER);
 
         botonSalir.addActionListener(new ActionListener() {
@@ -881,8 +884,8 @@ public class VistaGrafica extends JFrame implements IVista, Serializable {
         // Botón revancha
         JButton botonVolverAJugar = new JButton("Revancha");
         botonVolverAJugar.setVisible(true);
-        botonVolverAJugar.setSize(Const.SIZE_BTN_X + 10, Const.SIZE_BTN_Y);
-        botonVolverAJugar.setLocation(Const.LOC_BTN_DERECHA_X, Const.LOC_BTN_Y);
+        botonVolverAJugar.setSize(GuiConstants.SIZE_BTN_X + 10, GuiConstants.SIZE_BTN_Y);
+        botonVolverAJugar.setLocation(GuiConstants.LOC_BTN_DERECHA_X, GuiConstants.LOC_BTN_Y);
         capas.add(botonVolverAJugar, JLayeredPane.POPUP_LAYER);
 
         botonVolverAJugar.addActionListener(new ActionListener() {

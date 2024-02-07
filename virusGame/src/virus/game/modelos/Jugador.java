@@ -1,11 +1,8 @@
 package virus.game.modelos;
 
-import virus.game.modelos.cartas.Organo;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class Jugador implements Serializable {
     @Serial
@@ -81,8 +78,4 @@ public class Jugador implements Serializable {
         return cuerpoJugador;
     }
 
-    /* Agrega un organo al cuerpo (mesa) del jugador. Retorna verdadero si lo pudo agregar, falso si no. */
-    public boolean agregarOrganoAlCuerpo(Organo organo){
-        return cuerpoJugador.agregarOrganoAlCuerpo(organo);
-    }
 }

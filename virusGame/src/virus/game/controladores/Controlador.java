@@ -4,7 +4,6 @@ import ar.edu.unlu.rmimvc.cliente.IControladorRemoto;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import virus.game.modelos.*;
 import virus.game.modelos.cartas.Organo;
-import virus.game.utils.Serializador;
 import virus.game.utils.SerializadorDeGanadores;
 import virus.game.utils.SerializadorPartida;
 import virus.game.vistas.AccionVista;
@@ -106,16 +105,6 @@ public class Controlador implements IControladorRemoto, Serializable {
         return null;
     }
 
-    /* Devuelve el Cuerpo del jugador */
-    public Cuerpo getCuerpoJugador(){
-        try {
-            return modelo.getJugadorPorId(idJugador).getCuerpoJugador();
-        } catch (RemoteException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public ArrayList<Carta> getCartasDelMazoDeDescartes(){
         try {
             return (ArrayList<Carta>) modelo.getMazoDeDescarte().getCartas();
@@ -124,27 +113,31 @@ public class Controlador implements IControladorRemoto, Serializable {
         }
         return null;
     }
-
-    public ArrayList<Organo> getOrganosDelCuerpoDelJugador(){
-        return getCuerpoJugador().getOrganos();
+    public ArrayList<Organo> getOrganosDelCuerpoDelJugador() {
+        try {
+            return modelo.getJugadorPorId(idJugador).getCuerpoJugador().getOrganos();
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public ArrayList<Organo> getOrganosDelCuerpoDelRival() {
-        return getCuerpoRival().getOrganos();
+        return getRival().getCuerpoJugador().getOrganos();
     }
     /* Obtiene el cuerpo del jugador en un String concatenado */
     public String getCuerpoJugadorToString(){
-        return getCuerpoJugador().toString();
-    }
-
-    /* Devuelve el cuerpo del rival */
-    public Cuerpo getCuerpoRival(){
-        return getRival().getCuerpoJugador();
+        try {
+            return modelo.getJugadorPorId(idJugador).getCuerpoJugador().toString();
+        } catch (RemoteException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /* Devuelve el cuerpo del rival en un String concatenado */
     public String getCuerpoRivalToString(){
-        return getCuerpoRival().toString();
+        return getRival().getCuerpoJugador().toString();
     }
 
     public Jugador getTurnoJugador(){
@@ -215,7 +208,7 @@ public class Controlador implements IControladorRemoto, Serializable {
 
     public String nombreJugadoresEnPartidaGuardada(){
         try {
-            return new SerializadorPartida().nombreJugadores();
+            return new SerializadorPartida().getNombreDeJugadoresEnPartidaGuardada();
         } catch (RemoteException e){
             e.printStackTrace();
         }
@@ -252,7 +245,7 @@ public class Controlador implements IControladorRemoto, Serializable {
             }
             idRival = modelo.getRival(idJugador).getNumeroDeJugador();
             avisarCambioDeTurno();
-            
+
             sePudocargar = true;
         } catch (RemoteException e){
             e.printStackTrace();
@@ -276,7 +269,7 @@ public class Controlador implements IControladorRemoto, Serializable {
                     break;
                 }
                 case ESPERAR_REGISTRO:{
-                    if(idRival == -2){
+                    if(idRival == -2 && idJugador != -1){
                         vista.avisarEsperaALosDemasJugadores();
                     }
                     break;

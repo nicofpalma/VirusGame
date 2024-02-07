@@ -116,7 +116,7 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
         return sePudoJugarUnaCarta;
     }
 
-
+    @Override
     public boolean jugarCarta(Jugador jugador, Tratamiento tratamiento) throws RemoteException{
         // Id 1 = error médico
         if(tratamiento.getId() == 1){
@@ -418,6 +418,9 @@ public class Modelo extends ObservableRemoto implements IModelo, Serializable {
                     String nombreGanador = ganador.getNombre();
                     String nombrePerdedor = getRival(ganador.getNumeroDeJugador()).getNombre();
                     new SerializadorDeGanadores(nombreGanador, nombrePerdedor);
+
+                    // Borro la partida que estaba guardada
+                    new SerializadorPartida().borrarPartidaGuardada();
                     if(ganador.getNumeroDeJugador() == 1){
                         notificarObservadores(AccionModelo.GANO_JUGADOR_1);
                     } else {

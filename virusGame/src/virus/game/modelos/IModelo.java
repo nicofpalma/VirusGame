@@ -3,6 +3,7 @@ package virus.game.modelos;
 import ar.edu.unlu.rmimvc.observer.IObservableRemoto;
 import virus.game.modelos.cartas.Medicina;
 import virus.game.modelos.cartas.Organo;
+import virus.game.modelos.cartas.Tratamiento;
 import virus.game.modelos.cartas.Virus;
 
 import java.rmi.RemoteException;
@@ -18,6 +19,8 @@ public interface IModelo extends IObservableRemoto {
     void iniciarJuego() throws RemoteException;
 
     boolean realizarAccionDeCarta(int idJugador, int numCarta) throws RemoteException;
+
+    boolean jugarCarta(Jugador jugador, Tratamiento tratamiento) throws RemoteException;
 
     boolean jugarCarta(Jugador jugador, Organo organo) throws RemoteException;
 

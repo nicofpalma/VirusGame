@@ -17,6 +17,7 @@ public class VistaConsola extends JFrame implements IVista {
     private JScrollPane areaConsola;
     private JTextArea areaTextoConsola;
     private JPanel panel;
+    private JButton botonCargarPartida;
     private AccionVista accionVista;
     private Controlador controlador;
 
@@ -59,6 +60,26 @@ public class VistaConsola extends JFrame implements IVista {
                     default: {
                         break;
                     }
+                }
+            }
+        });
+
+        botonCargarPartida.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(controlador.hayPartidaGuardada()){
+                    int respuesta = JOptionPane.showConfirmDialog(
+                            null,
+                            "¿Desea reanudar la partida de " + controlador.nombreJugadoresEnPartidaGuardada() + "?", "Reanudar partida",
+                            JOptionPane.YES_NO_OPTION
+                    );
+
+                    if(respuesta == JOptionPane.YES_OPTION){
+                        controlador.cargarPartidaGuardada();
+                        mostrarMesa();
+                    }
+                }  else {
+                    mostrarTextoEnNuevaLinea("No hay ninguna partida para reanudar");
                 }
             }
         });
@@ -373,6 +394,7 @@ public class VistaConsola extends JFrame implements IVista {
             if(!nombre.isEmpty()){
                 controlador.nuevoJugador(nombre);
                 borrarInputUsuario();
+                botonCargarPartida.setVisible(false);
             } else {
                 mostrarTextoEnNuevaLinea("No puedes dejar el nombre vacío.");
             }
